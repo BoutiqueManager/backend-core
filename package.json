@@ -7,10 +7,10 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "npm run build"
   },
   "dependencies": {
-    "crypto": "^1.0.1",
     "typeorm": "^0.3.28"
   },
   "peerDependencies": {
