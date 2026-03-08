@@ -1,0 +1,19 @@
+{
+  "name": "@org/backend-core",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "typeorm": "^0.3.28"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.28"
+  }
+}
