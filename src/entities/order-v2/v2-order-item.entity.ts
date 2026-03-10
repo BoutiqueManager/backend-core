@@ -60,6 +60,7 @@ export class V2OrderItem {
   productSku: string;
 
   /** Cross-server ref to boutique-server inventory table */
+  //  Deprecated: inventoryId is no longer used for order processing but is kept for legacy orders and search indexing. New orders should rely on productSizeId and customizationOptions for inventory details.
   @Column({ type: "uuid", nullable: true })
   inventoryId: string;
 
@@ -87,6 +88,7 @@ export class V2OrderItem {
 
   // ─── Size & Customization ─────────────────────────────────────────────────
   /** e.g. "M", "XL", "32", "Free Size" */
+  // @Deprecated: selectedSize is now stored in productSizeId for ready_to_ship items, and in customizationOptions for made_to_measure items. This column is kept for legacy orders and search indexing but should not be used for new orders.
   @Column({ type: "varchar", length: 50, nullable: true })
   selectedSize: string;
 
@@ -127,9 +129,6 @@ export class V2OrderItem {
   offerPrice: number;
 
   /** Discount applied via campaign/bulk discount */
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
-  campaignDiscount: number;
-
   @Column({ type: "varchar", length: 50, nullable: true })
   campaignCode: string;
 
@@ -140,7 +139,7 @@ export class V2OrderItem {
   @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
   taxPerItem: number;
 
-  /** offerPrice − campaignDiscount − couponDiscountPerItem + taxPerItem */
+  /** offerPrice − couponDiscountPerItem + taxPerItem */
   @Column({ type: "decimal", precision: 10, scale: 2 })
   finalPricePerItem: number;
 
@@ -166,6 +165,29 @@ export class V2OrderItem {
   /** finalPricePerItem × quantity — the canonical amount for refund calculation */
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalFinalPrice: number;
+
+  // ─── Per-Item Partial / Advance Payment ──────────────────────────────────
+  /**
+   * For made_to_measure items in a partial-payment order: the prorated advance
+   * amount charged at checkout for this item.
+   * For ready_to_ship or COD items this equals totalFinalPrice or 0 respectively.
+   * Snapshot from frontend — never changes after order creation.
+   */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  advancePaid: number;
+
+  @Column({ type: "decimal", precision: 5, scale: 2, default: 0 })
+  advancedPercentagePaid: number;
+
+  /**
+   * Balance still owed for this item after delivery.
+   * totalFinalPrice − advancePaid. 0 for full-payment and COD items.
+   */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  remainingAmount: number;
+
+  @Column({ type: "text", nullable: true })
+  customerNote: string;
 
   // ─── Item Status & Dates ──────────────────────────────────────────────────
   @Column({
