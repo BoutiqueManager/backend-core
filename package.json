@@ -10,6 +10,20 @@
     "build": "tsc",
     "prepare": "npm run build"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./backend": {
+      "types": "./dist/backend.d.ts",
+      "default": "./dist/backend.js"
+    },
+    "./entities": {
+      "types": "./dist/entities/index.d.ts",
+      "default": "./dist/entities/index.js"
+    }
+  },
   "dependencies": {
     "typeorm": "^0.3.28"
   },
