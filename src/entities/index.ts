@@ -1,7 +1,2 @@
-import { BlacklistedToken } from "./blacklisted-token.entity";
-
-export { BlacklistedToken };
-
-export const ENTITIES = [BlacklistedToken];
-
+export * from "./blacklisted-token.entity";
 export * from "./order-v2";
