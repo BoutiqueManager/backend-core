@@ -49,6 +49,18 @@ export class V2OrderItemEvent {
   @Column({ type: "text" })
   description: string;
 
+  /** Display title for timeline UI */
+  @Column({ type: "varchar", length: 100, nullable: true })
+  title: string;
+
+  /** Icon for timeline UI (emoji or icon name) */
+  @Column({ type: "varchar", length: 20, nullable: true })
+  icon: string;
+
+  /** Color hex code for timeline UI */
+  @Column({ type: "varchar", length: 10, nullable: true })
+  color: string;
+
   @Column({ type: "enum", enum: EventActorTypeV2 })
   actorType: EventActorTypeV2;
 
