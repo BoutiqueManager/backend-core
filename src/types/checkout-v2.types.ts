@@ -104,6 +104,9 @@ export interface V2CheckoutItem {
    * - COD: 0
    */
   advancedPercentagePaid: number;
+
+  /** Optional customer note for this specific order item */
+  customerNote?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -175,9 +178,6 @@ export interface V2CheckoutBoutique {
 
   /** Percentage of grandTotal paid as advance: (advancePaid / grandTotal) * 100 */
   advancePercentage: number;
-
-  /** Optional customer note for this boutique order */
-  customerNote?: string;
 
   /** Array of checkout items for this boutique */
   items: V2CheckoutItem[];
