@@ -20,8 +20,10 @@
       "default": "./dist/entities/index.js"
     }
   },
-  "dependencies": {
-    "typeorm": "^0.3.28"
+  "typesVersions": {
+    "*": {
+      "entities": ["dist/entities/index.d.ts"]
+    }
   },
   "peerDependencies": {
     "typeorm": "^0.3.28"
