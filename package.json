@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc",
-    "prepare": "npm run build"
+    "build": "tsc"
   },
   "exports": {
     ".": {
