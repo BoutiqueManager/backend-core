@@ -21,10 +21,16 @@
   },
   "typesVersions": {
     "*": {
-      "entities": ["dist/entities/index.d.ts"]
+      "entities": [
+        "dist/entities/index.d.ts"
+      ]
     }
   },
   "peerDependencies": {
     "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "typeorm": "^0.3.28",
+    "typescript": "^5.7.3"
   }
 }
