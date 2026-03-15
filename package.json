@@ -7,12 +7,21 @@
     "dist"
   ],
   "scripts": {
+    "dev": "tsc --watch",
     "build": "tsc"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
     },
     "./entities": {
       "types": "./dist/entities/index.d.ts",
@@ -29,8 +38,7 @@
   "peerDependencies": {
     "typeorm": "^0.3.28"
   },
-  "devDependencies": {
-    "typeorm": "^0.3.28",
-    "typescript": "^5.7.3"
+  "dependencies": {
+    "typescript": "^5.9.3"
   }
 }
