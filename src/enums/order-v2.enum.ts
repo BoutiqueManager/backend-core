@@ -45,7 +45,7 @@ export enum OrderItemStatusV2 {
   EXCHANGE_REJECTED = "EXCHANGE_REJECTED",
 }
 
-/** Whether item is ready-to-ship or made-to-measure (customized). */
+/** Whether item is ready_to_ship or made_to_measure (customized). */
 export enum ProductTypeV2 {
   READY_TO_SHIP = "ready_to_ship",
   MADE_TO_MEASURE = "made_to_measure",
