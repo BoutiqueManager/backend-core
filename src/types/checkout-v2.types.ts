@@ -341,7 +341,7 @@ export interface PaymentData {
   totalPartialPaymentAmount: number;
 
   /**
-   * For made-to-measure items in partial payment:
+   * For made_to_measure items in partial payment:
    * percentage of MTM item price to pay now (20-100)
    */
   madeToMeasurePercentage?: number;

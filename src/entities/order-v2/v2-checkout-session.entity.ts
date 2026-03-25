@@ -60,7 +60,7 @@ export class V2CheckoutSession {
   grandTotal: number;
 
   // ─── Partial Payment ──────────────────────────────────────────────────────
-  /** True if any order in this session has made-to-measure items */
+  /** True if any order in this session has made_to_measure items */
   @Column({ type: "boolean", default: false })
   hasPartialPayment: boolean;
 
