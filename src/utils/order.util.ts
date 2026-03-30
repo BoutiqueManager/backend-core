@@ -12,7 +12,7 @@ export interface Address {
   state: string;
   country: string;
 
-  pincode: string;
+  pincode?: string;
   postalCode?: string; // Alias for pincode
 
   landmark?: string;
