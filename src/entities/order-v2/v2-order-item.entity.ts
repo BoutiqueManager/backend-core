@@ -147,12 +147,13 @@ export class V2OrderItem {
   @Column({ type: "int", default: 1 })
   quantity: number;
 
+  // total MRP is the MRP per Item  * quantity
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalMrp: number;
 
+  // total discount is the discount per item(MRP  -offered price) * quantity
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalDiscount: number;
-
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalOfferPrice: number;
 
