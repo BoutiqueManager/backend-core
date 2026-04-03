@@ -3,7 +3,6 @@ export type {
   UnitType,
   CategoryType,
   PresetMeasurement,
-  CustomExplanation,
   CategoryData,
   SizeGuideData,
 } from "../entities/boutique-size-guide.entity";

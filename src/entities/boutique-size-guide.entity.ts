@@ -15,17 +15,12 @@ export interface PresetMeasurement {
   measurements: Record<string, string>;
 }
 
-export interface CustomExplanation {
-  title: string;
-  explanation: string;
-}
-
 export interface CategoryData {
   categoryType: CategoryType;
   presets: PresetMeasurement[];
   customEnabled: boolean;
   customTypes: string[];
-  customExplanations: CustomExplanation[];
+  customExplanations: Record<string, string>; // Changed: measurement name => explanation
 }
 
 export interface SizeGuideData {
