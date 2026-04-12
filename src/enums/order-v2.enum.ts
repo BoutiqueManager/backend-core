@@ -54,7 +54,7 @@ export enum ProductTypeV2 {
 /** Distinguishes which payment leg a v2_payment record represents. */
 export enum PaymentTypeV2 {
   FULL = "full",
-  PARTIAL = "partial", // formerly ADVANCE — any checkout where full amount is not paid
+  PARTIAL = "partial",
   REMAINING_BALANCE = "remaining_balance",
   EXCHANGE_TOP_UP = "exchange_top_up",
 }
@@ -72,7 +72,7 @@ export enum PaymentStatusV2 {
 /** High-level payment status stored on v2_orders. */
 export enum OrderPaymentStatusV2 {
   PENDING = "pending",
-  PARTIAL_PAID = "partial_paid", // formerly ADVANCE_PAID
+  PARTIAL_PAID = "partial_paid",
   COMPLETED = "completed",
   FAILED = "failed",
   REFUNDED = "refunded",
