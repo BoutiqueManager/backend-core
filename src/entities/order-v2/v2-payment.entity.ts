@@ -97,6 +97,53 @@ export class V2Payment {
   @Column({ type: "jsonb", nullable: true })
   razorpayResponse: Record<string, any>;
 
+  @Column({ type: "varchar", length: 20, nullable: true })
+  razorpayMethod: string;
+
+  /** Wallet provider name e.g. "mobikwik", "paytm" — populated when method = "wallet" */
+  @Column({ type: "varchar", length: 50, nullable: true })
+  walletName: string;
+
+  /** Netbanking bank code e.g. "HDFC", "ICIC" — populated when method = "netbanking" */
+  @Column({ type: "varchar", length: 20, nullable: true })
+  bank: string;
+
+  /** Razorpay platform fee in rupees */
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  gatewayFee: number;
+
+  /** GST on Razorpay fee in rupees */
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  gatewayTax: number;
+
+  /** Whether an international payment method was used */
+  @Column({ type: "boolean", nullable: true })
+  international: boolean;
+
+  /** Amount already refunded by Razorpay in rupees (for reconciliation) */
+  @Column({ type: "decimal", precision: 12, scale: 2, nullable: true })
+  amountRefunded: number;
+
+  /** Razorpay error_source e.g. "customer", "bank", "business" */
+  @Column({ type: "varchar", length: 100, nullable: true })
+  errorSource: string;
+
+  /** Razorpay error_step e.g. "payment_authorization" */
+  @Column({ type: "varchar", length: 100, nullable: true })
+  errorStep: string;
+
+  /** Razorpay error_reason e.g. "payment_failed", "card_declined" */
+  @Column({ type: "varchar", length: 200, nullable: true })
+  errorReason: string;
+
+  /** Bank/gateway acquirer reference data (e.g. bank_transaction_id) */
+  @Column({ type: "jsonb", nullable: true })
+  acquirerData: Record<string, any>;
+
+  /** Timestamp when Razorpay confirmed the payment was captured */
+  @Column({ type: "timestamp", nullable: true })
+  capturedAt: Date;
+
   // ─── UPI Fields ───────────────────────────────────────────────────────────
   @Column({ type: "varchar", nullable: true })
   upiTransactionId: string;
@@ -111,6 +158,14 @@ export class V2Payment {
   @Column({ type: "enum", enum: CardBrand, nullable: true })
   cardBrand: CardBrand;
 
+  /** Card type: "debit" or "credit" — from Razorpay card.type */
+  @Column({ type: "varchar", length: 10, nullable: true })
+  cardType: string;
+
+  /** Issuing bank of the card e.g. "HDFC", "SBI" — populated when method = "card" */
+  @Column({ type: "varchar", length: 50, nullable: true })
+  cardIssuingBank: string;
+
   /** FK to customer_payment_methods — set if saved payment method was used */
   @Column({ type: "uuid", nullable: true })
   savedPaymentMethodId: string;
@@ -118,6 +173,27 @@ export class V2Payment {
   // ─── COD Fields ───────────────────────────────────────────────────────────
   @Column({ type: "timestamp", nullable: true })
   codCollectedAt: Date;
+
+  // ─── Retry & Error Tracking ───────────────────────────────────────────────
+  /** Links to the original failed payment this is a retry of */
+  @Column({ type: "uuid", nullable: true })
+  retryOf: string;
+
+  /** Razorpay error code (e.g. BAD_REQUEST_ERROR) */
+  @Column({ type: "varchar", length: 100, nullable: true })
+  gatewayErrorCode: string;
+
+  /** Human-readable error description from Razorpay */
+  @Column({ type: "text", nullable: true })
+  gatewayErrorDescription: string;
+
+  /** Timestamp when webhook confirmed this payment */
+  @Column({ type: "timestamp", nullable: true })
+  webhookReceivedAt: Date;
+
+  /** Number of payment attempts for this record */
+  @Column({ type: "int", default: 1 })
+  attemptCount: number;
 
   // ─── Lifecycle Timestamps ─────────────────────────────────────────────────
   @Column({ type: "timestamp", nullable: true })

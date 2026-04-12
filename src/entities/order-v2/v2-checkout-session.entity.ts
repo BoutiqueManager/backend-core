@@ -115,6 +115,24 @@ export class V2CheckoutSession {
   @Column({ type: "timestamp", nullable: true })
   completedAt: Date;
 
+  // ─── Session Management ───────────────────────────────────────────────────
+  /** Session expires 30 min after creation — checked by abandoned checkout CRON */
+  @Column({ type: "timestamp", nullable: true })
+  sessionExpiresAt: Date;
+
+  /** Set when CRON marks session as abandoned */
+  @Column({ type: "timestamp", nullable: true })
+  abandonedAt: Date;
+
+  /** Number of payment retry attempts for this session */
+  @Column({ type: "int", default: 0 })
+  retryCount: number;
+
+  /** Idempotency key to prevent duplicate Razorpay order creation */
+  @Index({ unique: true, where: '"idempotencyKey" IS NOT NULL' })
+  @Column({ type: "varchar", length: 64, nullable: true })
+  idempotencyKey: string;
+
   // ─── Relations ────────────────────────────────────────────────────────────
   @OneToMany(() => V2Order, (order) => order.checkoutSession)
   orders: V2Order[];

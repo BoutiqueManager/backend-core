@@ -281,6 +281,21 @@ export interface CheckoutPaymentInfo {
 /**
  * Response from checkout API
  */
+/** Razorpay order details nested in the checkout response (absent for COD) */
+export interface CheckoutRazorpayInfo {
+  /** Razorpay order ID — pass to RazorpayCheckout.open() as order_id */
+  razorPayOrderId: string;
+  /** Razorpay public key_id */
+  keyId: string;
+  /** Payment amount in paise (×100) */
+  amountInPaise: number;
+  /** Currency code, e.g. "INR" */
+  currency: string;
+
+  /** UUID of the checkout session (for retrying payment if needed) */
+  checkoutSessionId: string;
+}
+
 export interface CheckoutResponse {
   /** UUID of the checkout session */
   checkoutSessionId: string;
@@ -290,6 +305,9 @@ export interface CheckoutResponse {
 
   /** Payment information (null for COD) */
   payment: CheckoutPaymentInfo | null;
+
+  /** Populated for non-COD orders; absent for COD */
+  razorpay?: CheckoutRazorpayInfo;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
