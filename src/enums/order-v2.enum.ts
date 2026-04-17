@@ -43,6 +43,7 @@ export enum OrderItemStatusV2 {
   EXCHANGE_DELIVERED = "EXCHANGE_DELIVERED",
   EXCHANGED = "EXCHANGED",
   EXCHANGE_REJECTED = "EXCHANGE_REJECTED",
+  LOGISTICS_APPROVAL_PENDING = "LOGISTICS_APPROVAL_PENDING",
 }
 
 /** Whether item is ready_to_ship or made_to_measure (customized). */
