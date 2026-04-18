@@ -160,11 +160,26 @@ export interface OrderItemDetailV2 {
   ratingId: string | null;
   customerNote: string;
   itemActions: {
-    canCancel: Boolean,
-    canReturn: Boolean,
-    canExchange: Boolean,
-    canReview: Boolean,
+    canCancel: Boolean;
+    canReturn: Boolean;
+    canExchange: Boolean;
+    canReview: Boolean;
   };
+  packingMedia: Array<{
+    id: string;
+    orderItemId: string;
+    mediaType: string;
+    mediaSubtype: string;
+    originalKey: string;
+    previewKey: string;
+    fileName: string;
+    fileSize: string;
+    mimeType: string;
+    metadata: Record<string, any>;
+    isPrimary: boolean;
+    sortOrder: number;
+    createdAt: string;
+  }>;
 }
 
 export interface OrderDetailAddressV2 {

@@ -13,6 +13,7 @@ export enum OrderStatusV2 {
   DELIVERED = "DELIVERED",
   CANCELLED = "CANCELLED",
   PARTIALLY_CANCELLED = "PARTIALLY_CANCELLED",
+  RETURNED = "RETURNED",
 }
 
 /** Per-item status — tracks full lifecycle including return/exchange. */
