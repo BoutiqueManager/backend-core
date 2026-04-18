@@ -20,6 +20,9 @@ export enum OrderItemStatusV2 {
   NEW = "NEW",
   CONFIRMED = "CONFIRMED",
   IN_PROGRESS = "IN_PROGRESS",
+
+  LOGISTICS_APPROVAL_PENDING = "LOGISTICS_APPROVAL_PENDING", // for items awaiting logistics approval before shipping
+
   SHIPPED = "SHIPPED",
   OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
   DELIVERED = "DELIVERED",
@@ -57,6 +60,7 @@ export enum PaymentTypeV2 {
   PARTIAL = "partial",
   REMAINING_BALANCE = "remaining_balance",
   EXCHANGE_TOP_UP = "exchange_top_up",
+  ADVANCE = "advance",
 }
 
 /** Granular Razorpay-aligned payment status. */
@@ -77,6 +81,7 @@ export enum OrderPaymentStatusV2 {
   FAILED = "failed",
   REFUNDED = "refunded",
   PARTIALLY_REFUNDED = "partially_refunded",
+  ADVANCE_PAID = "advance_paid",
 }
 
 export enum PaymentMethodV2 {
