@@ -1,4 +1,4 @@
-import { OrderStatusV2 } from "../enums/order-v2.enum";
+import { OrderStatusV2, RefundStatusV2 } from "../enums/order-v2.enum";
 
 //////////////////////////////////////
 // Orders V2 Types
@@ -151,6 +151,10 @@ export interface OrderItemDetailV2 {
   cancelledAt: string | null;
   cancelledBy: string | null;
   cancellationReason: string | null;
+  refundStatus?: RefundStatusV2 | null;
+  refundInitiatedAt?: string | null;
+  refundBankProcessedAt?: string | null;
+  refundCreditedAt?: string | null;
   tracking: Record<string, any> | null;
   returnStatus: string | null;
   exchangeStatus: string | null;
