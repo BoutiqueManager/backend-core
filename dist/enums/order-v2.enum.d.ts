@@ -1,21 +1,21 @@
 /** Top-level order status, computed from item statuses per PRD global rules. */
 export declare enum OrderStatusV2 {
     NEW = "NEW",
-    CONFIRMED = "CONFIRMED",
     IN_PROGRESS = "IN_PROGRESS",
     SHIPPED = "SHIPPED",
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
     DELIVERED = "DELIVERED",
     CANCELLED = "CANCELLED",
     PARTIALLY_CANCELLED = "PARTIALLY_CANCELLED",
-    RETURNED = "RETURNED"
+    RETURNED = "RETURNED",
+    EXCHANGED = "EXCHANGED"
 }
 /** Per-item status — tracks full lifecycle including return/exchange. */
 export declare enum OrderItemStatusV2 {
     NEW = "NEW",
-    CONFIRMED = "CONFIRMED",
     IN_PROGRESS = "IN_PROGRESS",
-    LOGISTICS_APPROVAL_PENDING = "LOGISTICS_APPROVAL_PENDING",// for items awaiting logistics approval before shipping
+    SCHEDULED_PICKUP = "SCHEDULED_PICKUP",// for items awaiting scheduled pickup (return/exchange)
+    PICKUP_SCHEDULED = "PICKUP_SCHEDULED",// for items that have a pickup scheduled (return/exchange)
     SHIPPED = "SHIPPED",
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
     DELIVERED = "DELIVERED",

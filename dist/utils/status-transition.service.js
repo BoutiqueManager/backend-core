@@ -19,9 +19,9 @@ class StatusTransitionService {
     static getDefaultDescription(fromStatus, toStatus, actorType, reason) {
         const descriptions = {
             [order_v2_enum_1.OrderItemStatusV2.NEW]: "Order has been placed",
-            [order_v2_enum_1.OrderItemStatusV2.CONFIRMED]: "Order has been confirmed by the boutique",
             [order_v2_enum_1.OrderItemStatusV2.IN_PROGRESS]: "Your item is being prepared/customized",
-            [order_v2_enum_1.OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: "Your item is awaiting logistics approval",
+            [order_v2_enum_1.OrderItemStatusV2.SCHEDULED_PICKUP]: "Pickup has been scheduled for your item",
+            [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup is scheduled for your item",
             [order_v2_enum_1.OrderItemStatusV2.SHIPPED]: "Your item has been shipped",
             [order_v2_enum_1.OrderItemStatusV2.OUT_FOR_DELIVERY]: "Your item is out for delivery",
             [order_v2_enum_1.OrderItemStatusV2.DELIVERED]: "Your item has been delivered successfully",
@@ -67,9 +67,9 @@ exports.StatusTransitionService = StatusTransitionService;
  */
 StatusTransitionService.statusToEventMap = {
     [order_v2_enum_1.OrderItemStatusV2.NEW]: order_v2_enum_1.OrderEventTypeV2.ORDER_PLACED,
-    [order_v2_enum_1.OrderItemStatusV2.CONFIRMED]: order_v2_enum_1.OrderEventTypeV2.ITEM_CONFIRMED,
     [order_v2_enum_1.OrderItemStatusV2.IN_PROGRESS]: order_v2_enum_1.OrderEventTypeV2.IN_PROGRESS,
-    [order_v2_enum_1.OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: order_v2_enum_1.OrderEventTypeV2.READY_TO_SHIP,
+    [order_v2_enum_1.OrderItemStatusV2.SCHEDULED_PICKUP]: order_v2_enum_1.OrderEventTypeV2.READY_TO_SHIP,
+    [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: order_v2_enum_1.OrderEventTypeV2.READY_TO_SHIP,
     [order_v2_enum_1.OrderItemStatusV2.SHIPPED]: order_v2_enum_1.OrderEventTypeV2.ITEM_SHIPPED,
     [order_v2_enum_1.OrderItemStatusV2.OUT_FOR_DELIVERY]: order_v2_enum_1.OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
     [order_v2_enum_1.OrderItemStatusV2.DELIVERED]: order_v2_enum_1.OrderEventTypeV2.ITEM_DELIVERED,

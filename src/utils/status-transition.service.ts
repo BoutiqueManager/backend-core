@@ -15,10 +15,9 @@ export class StatusTransitionService {
   private static statusToEventMap: Record<OrderItemStatusV2, OrderEventTypeV2> =
     {
       [OrderItemStatusV2.NEW]: OrderEventTypeV2.ORDER_PLACED,
-      [OrderItemStatusV2.CONFIRMED]: OrderEventTypeV2.ITEM_CONFIRMED,
       [OrderItemStatusV2.IN_PROGRESS]: OrderEventTypeV2.IN_PROGRESS,
-      [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]:
-        OrderEventTypeV2.READY_TO_SHIP,
+      [OrderItemStatusV2.SCHEDULED_PICKUP]: OrderEventTypeV2.READY_TO_SHIP,
+      [OrderItemStatusV2.PICKUP_SCHEDULED]: OrderEventTypeV2.READY_TO_SHIP,
       [OrderItemStatusV2.SHIPPED]: OrderEventTypeV2.ITEM_SHIPPED,
       [OrderItemStatusV2.OUT_FOR_DELIVERY]:
         OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
@@ -69,9 +68,9 @@ export class StatusTransitionService {
   ): string {
     const descriptions: Record<OrderItemStatusV2, string> = {
       [OrderItemStatusV2.NEW]: "Order has been placed",
-      [OrderItemStatusV2.CONFIRMED]: "Order has been confirmed by the boutique",
       [OrderItemStatusV2.IN_PROGRESS]: "Your item is being prepared/customized",
-      [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: "Your item is awaiting logistics approval",
+      [OrderItemStatusV2.SCHEDULED_PICKUP]: "Pickup has been scheduled for your item",
+      [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup is scheduled for your item",
       [OrderItemStatusV2.SHIPPED]: "Your item has been shipped",
       [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Your item is out for delivery",
       [OrderItemStatusV2.DELIVERED]:

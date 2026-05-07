@@ -19,11 +19,9 @@ export enum OrderStatusV2 {
 /** Per-item status — tracks full lifecycle including return/exchange. */
 export enum OrderItemStatusV2 {
   NEW = "NEW",
-  CONFIRMED = "CONFIRMED",
   IN_PROGRESS = "IN_PROGRESS",
-
-  LOGISTICS_APPROVAL_PENDING = "LOGISTICS_APPROVAL_PENDING", // for items awaiting logistics approval before shipping
-
+  SCHEDULED_PICKUP = "SCHEDULED_PICKUP", // for items awaiting scheduled pickup (return/exchange)
+  PICKUP_SCHEDULED = "PICKUP_SCHEDULED", // for items that have a pickup scheduled (return/exchange)
   SHIPPED = "SHIPPED",
   OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
   DELIVERED = "DELIVERED",
@@ -295,7 +293,6 @@ export const getNextPossibleOrderStatuses = (
     [OrderStatusV2.IN_PROGRESS]: [
       OrderStatusV2.SHIPPED,
       OrderStatusV2.CANCELLED,
-      OrderStatusV2.PARTIALLY_CANCELLED,
     ],
     [OrderStatusV2.SHIPPED]: [
       OrderStatusV2.OUT_FOR_DELIVERY, // Usually auto-set by logistics
@@ -329,24 +326,19 @@ export const getNextPossibleItemStatuses = (
       OrderItemStatusV2.IN_PROGRESS,
       OrderItemStatusV2.CANCELLED,
     ],
-    [OrderItemStatusV2.CONFIRMED]: [
-      OrderItemStatusV2.IN_PROGRESS,
-      OrderItemStatusV2.CANCELLED,
-    ],
     [OrderItemStatusV2.IN_PROGRESS]: [
-      OrderItemStatusV2.SHIPPED, // Ready-to-ship items
+      OrderItemStatusV2.SCHEDULED_PICKUP, // Ready-to-ship items
       OrderItemStatusV2.CANCELLED,
     ],
-    [OrderItemStatusV2.SHIPPED]: [
-      OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING,
-      OrderItemStatusV2.CANCELLED,
-    ],
-    [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: [
-      OrderItemStatusV2.SHIPPED, // After logistics approval
-      OrderItemStatusV2.CANCELLED,
-    ],
+    // Scheduled Pickup -
+    [OrderItemStatusV2.SCHEDULED_PICKUP]: [OrderItemStatusV2.PICKUP_SCHEDULED],
+
+    [OrderItemStatusV2.PICKUP_SCHEDULED]: [OrderItemStatusV2.SHIPPED],
+    [OrderItemStatusV2.SHIPPED]: [OrderItemStatusV2.OUT_FOR_DELIVERY],
 
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
+
+    // Delivered once - can either be returned or marked as completed
     [OrderItemStatusV2.DELIVERED]: [
       OrderItemStatusV2.RETURN_INITIATED,
       OrderItemStatusV2.EXCHANGE_INITIATED,
@@ -455,9 +447,7 @@ export const ORDER_ITEM_STATUS_DISPLAY_NAMES: Record<
   string
 > = {
   [OrderItemStatusV2.NEW]: "New",
-  [OrderItemStatusV2.CONFIRMED]: "Confirmed",
   [OrderItemStatusV2.IN_PROGRESS]: "In Progress",
-  [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: "Logistics Approval Pending",
   [OrderItemStatusV2.SHIPPED]: "Shipped",
   [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
   [OrderItemStatusV2.DELIVERED]: "Delivered",
@@ -481,6 +471,8 @@ export const ORDER_ITEM_STATUS_DISPLAY_NAMES: Record<
   [OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange Delivered",
   [OrderItemStatusV2.EXCHANGED]: "Exchanged",
   [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
+  [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup for logistics",
+  [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup has been Scheduled",
 };
 
 /**

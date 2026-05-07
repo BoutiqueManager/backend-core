@@ -9,7 +9,6 @@ exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = export
 var OrderStatusV2;
 (function (OrderStatusV2) {
     OrderStatusV2["NEW"] = "NEW";
-    OrderStatusV2["CONFIRMED"] = "CONFIRMED";
     OrderStatusV2["IN_PROGRESS"] = "IN_PROGRESS";
     OrderStatusV2["SHIPPED"] = "SHIPPED";
     OrderStatusV2["OUT_FOR_DELIVERY"] = "OUT_FOR_DELIVERY";
@@ -17,14 +16,15 @@ var OrderStatusV2;
     OrderStatusV2["CANCELLED"] = "CANCELLED";
     OrderStatusV2["PARTIALLY_CANCELLED"] = "PARTIALLY_CANCELLED";
     OrderStatusV2["RETURNED"] = "RETURNED";
+    OrderStatusV2["EXCHANGED"] = "EXCHANGED";
 })(OrderStatusV2 || (exports.OrderStatusV2 = OrderStatusV2 = {}));
 /** Per-item status — tracks full lifecycle including return/exchange. */
 var OrderItemStatusV2;
 (function (OrderItemStatusV2) {
     OrderItemStatusV2["NEW"] = "NEW";
-    OrderItemStatusV2["CONFIRMED"] = "CONFIRMED";
     OrderItemStatusV2["IN_PROGRESS"] = "IN_PROGRESS";
-    OrderItemStatusV2["LOGISTICS_APPROVAL_PENDING"] = "LOGISTICS_APPROVAL_PENDING";
+    OrderItemStatusV2["SCHEDULED_PICKUP"] = "SCHEDULED_PICKUP";
+    OrderItemStatusV2["PICKUP_SCHEDULED"] = "PICKUP_SCHEDULED";
     OrderItemStatusV2["SHIPPED"] = "SHIPPED";
     OrderItemStatusV2["OUT_FOR_DELIVERY"] = "OUT_FOR_DELIVERY";
     OrderItemStatusV2["DELIVERED"] = "DELIVERED";
@@ -284,15 +284,10 @@ var SellerCancellationReason;
  */
 const getNextPossibleOrderStatuses = (currentStatus) => {
     const statusFlow = {
-        [OrderStatusV2.NEW]: [OrderStatusV2.CONFIRMED, OrderStatusV2.CANCELLED],
-        [OrderStatusV2.CONFIRMED]: [
-            OrderStatusV2.IN_PROGRESS,
-            OrderStatusV2.CANCELLED,
-        ],
+        [OrderStatusV2.NEW]: [OrderStatusV2.IN_PROGRESS, OrderStatusV2.CANCELLED],
         [OrderStatusV2.IN_PROGRESS]: [
             OrderStatusV2.SHIPPED,
             OrderStatusV2.CANCELLED,
-            OrderStatusV2.PARTIALLY_CANCELLED,
         ],
         [OrderStatusV2.SHIPPED]: [
             OrderStatusV2.OUT_FOR_DELIVERY, // Usually auto-set by logistics
@@ -308,6 +303,7 @@ const getNextPossibleOrderStatuses = (currentStatus) => {
             OrderStatusV2.CANCELLED, // All remaining items cancelled
         ],
         [OrderStatusV2.RETURNED]: [],
+        [OrderStatusV2.EXCHANGED]: [],
     };
     return statusFlow[currentStatus] || [];
 };
@@ -319,27 +315,19 @@ exports.getNextPossibleOrderStatuses = getNextPossibleOrderStatuses;
 const getNextPossibleItemStatuses = (currentStatus) => {
     const statusFlow = {
         [OrderItemStatusV2.NEW]: [
-            OrderItemStatusV2.CONFIRMED,
-            OrderItemStatusV2.CANCELLED,
-        ],
-        [OrderItemStatusV2.CONFIRMED]: [
             OrderItemStatusV2.IN_PROGRESS,
             OrderItemStatusV2.CANCELLED,
         ],
         [OrderItemStatusV2.IN_PROGRESS]: [
-            OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING, // Made-to-measure items
-            OrderItemStatusV2.SHIPPED, // Ready-to-ship items
+            OrderItemStatusV2.SCHEDULED_PICKUP, // Ready-to-ship items
             OrderItemStatusV2.CANCELLED,
         ],
-        [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: [
-            OrderItemStatusV2.SHIPPED, // After logistics approval
-            OrderItemStatusV2.CANCELLED,
-        ],
-        [OrderItemStatusV2.SHIPPED]: [
-            OrderItemStatusV2.OUT_FOR_DELIVERY,
-            OrderItemStatusV2.DELIVERED,
-        ],
+        // Scheduled Pickup -
+        [OrderItemStatusV2.SCHEDULED_PICKUP]: [OrderItemStatusV2.PICKUP_SCHEDULED],
+        [OrderItemStatusV2.PICKUP_SCHEDULED]: [OrderItemStatusV2.SHIPPED],
+        [OrderItemStatusV2.SHIPPED]: [OrderItemStatusV2.OUT_FOR_DELIVERY],
         [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
+        // Delivered once - can either be returned or marked as completed
         [OrderItemStatusV2.DELIVERED]: [
             OrderItemStatusV2.RETURN_INITIATED,
             OrderItemStatusV2.EXCHANGE_INITIATED,
@@ -426,7 +414,6 @@ exports.isItemStatusFinal = isItemStatusFinal;
  */
 exports.ORDER_STATUS_DISPLAY_NAMES = {
     [OrderStatusV2.NEW]: "New",
-    [OrderStatusV2.CONFIRMED]: "Confirmed",
     [OrderStatusV2.IN_PROGRESS]: "In Progress",
     [OrderStatusV2.SHIPPED]: "Shipped",
     [OrderStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
@@ -434,15 +421,14 @@ exports.ORDER_STATUS_DISPLAY_NAMES = {
     [OrderStatusV2.CANCELLED]: "Cancelled",
     [OrderStatusV2.PARTIALLY_CANCELLED]: "Partially Cancelled",
     [OrderStatusV2.RETURNED]: "Returned",
+    [OrderStatusV2.EXCHANGED]: "Exchanged",
 };
 /**
  * Item-level status display names for UI
  */
 exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.NEW]: "New",
-    [OrderItemStatusV2.CONFIRMED]: "Confirmed",
     [OrderItemStatusV2.IN_PROGRESS]: "In Progress",
-    [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: "Logistics Approval Pending",
     [OrderItemStatusV2.SHIPPED]: "Shipped",
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
     [OrderItemStatusV2.DELIVERED]: "Delivered",
@@ -466,6 +452,8 @@ exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange Delivered",
     [OrderItemStatusV2.EXCHANGED]: "Exchanged",
     [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
+    [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup",
+    [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup Scheduled",
 };
 /**
  * Convert OrderStatusV2 enum value to display name
