@@ -339,18 +339,18 @@ export const getNextPossibleItemStatuses = (
       OrderItemStatusV2.CANCELLED,
     ],
     [OrderItemStatusV2.IN_PROGRESS]: [
-      OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING, // Made-to-measure items
       OrderItemStatusV2.SHIPPED, // Ready-to-ship items
+      OrderItemStatusV2.CANCELLED,
+    ],
+    [OrderItemStatusV2.SHIPPED]: [
+      OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING,
       OrderItemStatusV2.CANCELLED,
     ],
     [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: [
       OrderItemStatusV2.SHIPPED, // After logistics approval
       OrderItemStatusV2.CANCELLED,
     ],
-    [OrderItemStatusV2.SHIPPED]: [
-      OrderItemStatusV2.OUT_FOR_DELIVERY,
-      OrderItemStatusV2.DELIVERED,
-    ],
+
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
     [OrderItemStatusV2.DELIVERED]: [
       OrderItemStatusV2.RETURN_INITIATED,
