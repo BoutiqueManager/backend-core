@@ -235,3 +235,59 @@ export declare enum SellerCancellationReason {
     PRICING_ERROR = "Pricing error",
     OTHER = "Other"
 }
+/**
+ * Returns the next possible order-level statuses that a seller can manually transition to.
+ * Note: Some transitions (e.g., OUT_FOR_DELIVERY) may be triggered by logistics systems.
+ */
+export declare const getNextPossibleOrderStatuses: (currentStatus: OrderStatusV2) => OrderStatusV2[];
+/**
+ * Returns the next possible item-level statuses.
+ * Items have a more granular lifecycle including return/exchange sub-flows.
+ */
+export declare const getNextPossibleItemStatuses: (currentStatus: OrderItemStatusV2) => OrderItemStatusV2[];
+/**
+ * Checks if an order-level status is terminal (no further transitions).
+ */
+export declare const isOrderStatusFinal: (status: OrderStatusV2) => boolean;
+/**
+ * Checks if an item-level status is terminal (no further transitions).
+ */
+export declare const isItemStatusFinal: (status: OrderItemStatusV2) => boolean;
+/**
+ * Order-level status display names for UI
+ */
+export declare const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatusV2, string>;
+/**
+ * Item-level status display names for UI
+ */
+export declare const ORDER_ITEM_STATUS_DISPLAY_NAMES: Record<OrderItemStatusV2, string>;
+/**
+ * Convert OrderStatusV2 enum value to display name
+ * @param status - Backend OrderStatusV2 enum value
+ * @returns Display name for UI
+ */
+export declare const getOrderStatusDisplayName: (status: OrderStatusV2) => string;
+/**
+ * Convert OrderItemStatusV2 enum value to display name
+ * @param status - Backend OrderItemStatusV2 enum value
+ * @returns Display name for UI
+ */
+export declare const getOrderItemStatusDisplayName: (status: OrderItemStatusV2) => string;
+/**
+ * Format array of order status enum values into display options for UI dropdowns/bottom sheets
+ * @param enumValues - Array of OrderStatusV2 enum values
+ * @returns Array of {key: enum, label: displayName} objects
+ */
+export declare const formatOrderStatusOptions: (enumValues: OrderStatusV2[]) => {
+    key: OrderStatusV2;
+    label: string;
+}[];
+/**
+ * Format array of item status enum values into display options for UI dropdowns/bottom sheets
+ * @param enumValues - Array of OrderItemStatusV2 enum values
+ * @returns Array of {key: enum, label: displayName} objects
+ */
+export declare const formatOrderItemStatusOptions: (enumValues: OrderItemStatusV2[]) => {
+    key: OrderItemStatusV2;
+    label: string;
+}[];

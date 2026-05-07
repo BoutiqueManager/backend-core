@@ -4,7 +4,7 @@
 // Source of truth for all v2 order-related enumerations.
 // ─────────────────────────────────────────────────────────────────────────────
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
+exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = exports.getOrderItemStatusDisplayName = exports.getOrderStatusDisplayName = exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = exports.ORDER_STATUS_DISPLAY_NAMES = exports.isItemStatusFinal = exports.isOrderStatusFinal = exports.getNextPossibleItemStatuses = exports.getNextPossibleOrderStatuses = exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
 /** Top-level order status, computed from item statuses per PRD global rules. */
 var OrderStatusV2;
 (function (OrderStatusV2) {
@@ -275,4 +275,242 @@ var SellerCancellationReason;
     SellerCancellationReason["PRICING_ERROR"] = "Pricing error";
     SellerCancellationReason["OTHER"] = "Other";
 })(SellerCancellationReason || (exports.SellerCancellationReason = SellerCancellationReason = {}));
+// ─────────────────────────────────────────────────────────────────────────────
+// Status Flow Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Returns the next possible order-level statuses that a seller can manually transition to.
+ * Note: Some transitions (e.g., OUT_FOR_DELIVERY) may be triggered by logistics systems.
+ */
+const getNextPossibleOrderStatuses = (currentStatus) => {
+    const statusFlow = {
+        [OrderStatusV2.NEW]: [OrderStatusV2.CONFIRMED, OrderStatusV2.CANCELLED],
+        [OrderStatusV2.CONFIRMED]: [
+            OrderStatusV2.IN_PROGRESS,
+            OrderStatusV2.CANCELLED,
+        ],
+        [OrderStatusV2.IN_PROGRESS]: [
+            OrderStatusV2.SHIPPED,
+            OrderStatusV2.CANCELLED,
+            OrderStatusV2.PARTIALLY_CANCELLED,
+        ],
+        [OrderStatusV2.SHIPPED]: [
+            OrderStatusV2.OUT_FOR_DELIVERY, // Usually auto-set by logistics
+            OrderStatusV2.DELIVERED, // Seller can mark delivered
+        ],
+        [OrderStatusV2.OUT_FOR_DELIVERY]: [OrderStatusV2.DELIVERED],
+        [OrderStatusV2.DELIVERED]: [
+            OrderStatusV2.RETURNED, // Customer initiates return after delivery
+        ],
+        [OrderStatusV2.CANCELLED]: [],
+        [OrderStatusV2.PARTIALLY_CANCELLED]: [
+            OrderStatusV2.SHIPPED, // Remaining items can still be shipped
+            OrderStatusV2.CANCELLED, // All remaining items cancelled
+        ],
+        [OrderStatusV2.RETURNED]: [],
+    };
+    return statusFlow[currentStatus] || [];
+};
+exports.getNextPossibleOrderStatuses = getNextPossibleOrderStatuses;
+/**
+ * Returns the next possible item-level statuses.
+ * Items have a more granular lifecycle including return/exchange sub-flows.
+ */
+const getNextPossibleItemStatuses = (currentStatus) => {
+    const statusFlow = {
+        [OrderItemStatusV2.NEW]: [
+            OrderItemStatusV2.CONFIRMED,
+            OrderItemStatusV2.CANCELLED,
+        ],
+        [OrderItemStatusV2.CONFIRMED]: [
+            OrderItemStatusV2.IN_PROGRESS,
+            OrderItemStatusV2.CANCELLED,
+        ],
+        [OrderItemStatusV2.IN_PROGRESS]: [
+            OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING, // Made-to-measure items
+            OrderItemStatusV2.SHIPPED, // Ready-to-ship items
+            OrderItemStatusV2.CANCELLED,
+        ],
+        [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: [
+            OrderItemStatusV2.SHIPPED, // After logistics approval
+            OrderItemStatusV2.CANCELLED,
+        ],
+        [OrderItemStatusV2.SHIPPED]: [
+            OrderItemStatusV2.OUT_FOR_DELIVERY,
+            OrderItemStatusV2.DELIVERED,
+        ],
+        [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
+        [OrderItemStatusV2.DELIVERED]: [
+            OrderItemStatusV2.RETURN_INITIATED,
+            OrderItemStatusV2.EXCHANGE_INITIATED,
+        ],
+        [OrderItemStatusV2.CANCELLED]: [],
+        // ── Return flow ──────────────────────────────────────────────────────────
+        [OrderItemStatusV2.RETURN_INITIATED]: [
+            OrderItemStatusV2.RETURN_PICKUP_SCHEDULED,
+            OrderItemStatusV2.RETURN_REJECTED,
+        ],
+        [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: [
+            OrderItemStatusV2.RETURN_PICKED_UP,
+        ],
+        [OrderItemStatusV2.RETURN_PICKED_UP]: [OrderItemStatusV2.RETURN_IN_TRANSIT],
+        [OrderItemStatusV2.RETURN_IN_TRANSIT]: [
+            OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER,
+        ],
+        [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]: [
+            OrderItemStatusV2.RETURNED,
+            OrderItemStatusV2.RETURN_REJECTED, // Seller inspects and rejects
+        ],
+        [OrderItemStatusV2.RETURNED]: [],
+        [OrderItemStatusV2.RETURN_REJECTED]: [],
+        // ── Exchange flow ─────────────────────────────────────────────────────────
+        [OrderItemStatusV2.EXCHANGE_INITIATED]: [
+            OrderItemStatusV2.EXCHANGE_PICKUP_SCHEDULED,
+            OrderItemStatusV2.EXCHANGE_REJECTED,
+        ],
+        [OrderItemStatusV2.EXCHANGE_PICKUP_SCHEDULED]: [
+            OrderItemStatusV2.EXCHANGE_PICKED_UP,
+        ],
+        [OrderItemStatusV2.EXCHANGE_PICKED_UP]: [
+            OrderItemStatusV2.EXCHANGE_IN_TRANSIT,
+        ],
+        [OrderItemStatusV2.EXCHANGE_IN_TRANSIT]: [
+            OrderItemStatusV2.EXCHANGE_RECEIVED_BY_SELLER,
+        ],
+        [OrderItemStatusV2.EXCHANGE_RECEIVED_BY_SELLER]: [
+            OrderItemStatusV2.EXCHANGE_ORDER_PLACED,
+            OrderItemStatusV2.EXCHANGE_REJECTED, // Seller inspects and rejects
+        ],
+        [OrderItemStatusV2.EXCHANGE_ORDER_PLACED]: [
+            OrderItemStatusV2.EXCHANGE_SHIPPED,
+        ],
+        [OrderItemStatusV2.EXCHANGE_SHIPPED]: [
+            OrderItemStatusV2.EXCHANGE_DELIVERED,
+        ],
+        [OrderItemStatusV2.EXCHANGE_DELIVERED]: [OrderItemStatusV2.EXCHANGED],
+        [OrderItemStatusV2.EXCHANGED]: [],
+        [OrderItemStatusV2.EXCHANGE_REJECTED]: [],
+    };
+    return statusFlow[currentStatus] || [];
+};
+exports.getNextPossibleItemStatuses = getNextPossibleItemStatuses;
+/**
+ * Checks if an order-level status is terminal (no further transitions).
+ */
+const isOrderStatusFinal = (status) => {
+    return (status === OrderStatusV2.DELIVERED ||
+        status === OrderStatusV2.CANCELLED ||
+        status === OrderStatusV2.RETURNED);
+};
+exports.isOrderStatusFinal = isOrderStatusFinal;
+/**
+ * Checks if an item-level status is terminal (no further transitions).
+ */
+const isItemStatusFinal = (status) => {
+    const finalStatuses = [
+        OrderItemStatusV2.DELIVERED,
+        OrderItemStatusV2.CANCELLED,
+        OrderItemStatusV2.RETURNED,
+        OrderItemStatusV2.EXCHANGED,
+        OrderItemStatusV2.RETURN_REJECTED,
+        OrderItemStatusV2.EXCHANGE_REJECTED,
+    ];
+    return finalStatuses.includes(status);
+};
+exports.isItemStatusFinal = isItemStatusFinal;
+// ─────────────────────────────────────────────────────────────────────────────
+// Display Name Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Order-level status display names for UI
+ */
+exports.ORDER_STATUS_DISPLAY_NAMES = {
+    [OrderStatusV2.NEW]: "New",
+    [OrderStatusV2.CONFIRMED]: "Confirmed",
+    [OrderStatusV2.IN_PROGRESS]: "In Progress",
+    [OrderStatusV2.SHIPPED]: "Shipped",
+    [OrderStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
+    [OrderStatusV2.DELIVERED]: "Delivered",
+    [OrderStatusV2.CANCELLED]: "Cancelled",
+    [OrderStatusV2.PARTIALLY_CANCELLED]: "Partially Cancelled",
+    [OrderStatusV2.RETURNED]: "Returned",
+};
+/**
+ * Item-level status display names for UI
+ */
+exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
+    [OrderItemStatusV2.NEW]: "New",
+    [OrderItemStatusV2.CONFIRMED]: "Confirmed",
+    [OrderItemStatusV2.IN_PROGRESS]: "In Progress",
+    [OrderItemStatusV2.LOGISTICS_APPROVAL_PENDING]: "Logistics Approval Pending",
+    [OrderItemStatusV2.SHIPPED]: "Shipped",
+    [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
+    [OrderItemStatusV2.DELIVERED]: "Delivered",
+    [OrderItemStatusV2.CANCELLED]: "Cancelled",
+    // Return flow
+    [OrderItemStatusV2.RETURN_INITIATED]: "Return Initiated",
+    [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: "Return Pickup Scheduled",
+    [OrderItemStatusV2.RETURN_PICKED_UP]: "Return Picked Up",
+    [OrderItemStatusV2.RETURN_IN_TRANSIT]: "Return in Transit",
+    [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]: "Return Received",
+    [OrderItemStatusV2.RETURNED]: "Returned",
+    [OrderItemStatusV2.RETURN_REJECTED]: "Return Rejected",
+    // Exchange flow
+    [OrderItemStatusV2.EXCHANGE_INITIATED]: "Exchange Initiated",
+    [OrderItemStatusV2.EXCHANGE_PICKUP_SCHEDULED]: "Exchange Pickup Scheduled",
+    [OrderItemStatusV2.EXCHANGE_PICKED_UP]: "Exchange Picked Up",
+    [OrderItemStatusV2.EXCHANGE_IN_TRANSIT]: "Exchange in Transit",
+    [OrderItemStatusV2.EXCHANGE_RECEIVED_BY_SELLER]: "Exchange Received",
+    [OrderItemStatusV2.EXCHANGE_ORDER_PLACED]: "Exchange Order Placed",
+    [OrderItemStatusV2.EXCHANGE_SHIPPED]: "Exchange Shipped",
+    [OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange Delivered",
+    [OrderItemStatusV2.EXCHANGED]: "Exchanged",
+    [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
+};
+/**
+ * Convert OrderStatusV2 enum value to display name
+ * @param status - Backend OrderStatusV2 enum value
+ * @returns Display name for UI
+ */
+const getOrderStatusDisplayName = (status) => {
+    return exports.ORDER_STATUS_DISPLAY_NAMES[status] || status;
+};
+exports.getOrderStatusDisplayName = getOrderStatusDisplayName;
+/**
+ * Convert OrderItemStatusV2 enum value to display name
+ * @param status - Backend OrderItemStatusV2 enum value
+ * @returns Display name for UI
+ */
+const getOrderItemStatusDisplayName = (status) => {
+    return exports.ORDER_ITEM_STATUS_DISPLAY_NAMES[status] || status;
+};
+exports.getOrderItemStatusDisplayName = getOrderItemStatusDisplayName;
+/**
+ * Format array of order status enum values into display options for UI dropdowns/bottom sheets
+ * @param enumValues - Array of OrderStatusV2 enum values
+ * @returns Array of {key: enum, label: displayName} objects
+ */
+const formatOrderStatusOptions = (enumValues) => {
+    if (!Array.isArray(enumValues))
+        return [];
+    return enumValues.map((enumValue) => ({
+        key: enumValue,
+        label: (0, exports.getOrderStatusDisplayName)(enumValue),
+    }));
+};
+exports.formatOrderStatusOptions = formatOrderStatusOptions;
+/**
+ * Format array of item status enum values into display options for UI dropdowns/bottom sheets
+ * @param enumValues - Array of OrderItemStatusV2 enum values
+ * @returns Array of {key: enum, label: displayName} objects
+ */
+const formatOrderItemStatusOptions = (enumValues) => {
+    if (!Array.isArray(enumValues))
+        return [];
+    return enumValues.map((enumValue) => ({
+        key: enumValue,
+        label: (0, exports.getOrderItemStatusDisplayName)(enumValue),
+    }));
+};
+exports.formatOrderItemStatusOptions = formatOrderItemStatusOptions;
 //# sourceMappingURL=order-v2.enum.js.map
