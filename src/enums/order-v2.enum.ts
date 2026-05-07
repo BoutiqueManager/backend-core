@@ -14,6 +14,7 @@ export enum OrderStatusV2 {
   CANCELLED = "CANCELLED",
   PARTIALLY_CANCELLED = "PARTIALLY_CANCELLED",
   RETURNED = "RETURNED",
+  EXCHANGED = "EXCHANGED",
 }
 
 /** Per-item status — tracks full lifecycle including return/exchange. */
@@ -315,6 +316,7 @@ export const getNextPossibleOrderStatuses = (
       OrderStatusV2.CANCELLED, // All remaining items cancelled
     ],
     [OrderStatusV2.RETURNED]: [],
+    [OrderStatusV2.EXCHANGED]: [],
   };
 
   return statusFlow[currentStatus] || [];
@@ -448,6 +450,7 @@ export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatusV2, string> = {
   [OrderStatusV2.CANCELLED]: "Cancelled",
   [OrderStatusV2.PARTIALLY_CANCELLED]: "Partially Cancelled",
   [OrderStatusV2.RETURNED]: "Returned",
+  [OrderStatusV2.EXCHANGED]: "Exchanged",
 };
 
 /**
