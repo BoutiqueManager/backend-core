@@ -69,7 +69,8 @@ export class StatusTransitionService {
     const descriptions: Record<OrderItemStatusV2, string> = {
       [OrderItemStatusV2.NEW]: "Order has been placed",
       [OrderItemStatusV2.IN_PROGRESS]: "Your item is being prepared/customized",
-      [OrderItemStatusV2.SCHEDULED_PICKUP]: "Pickup has been scheduled for your item",
+      [OrderItemStatusV2.SCHEDULED_PICKUP]:
+        "Pickup has been scheduled for your item",
       [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup is scheduled for your item",
       [OrderItemStatusV2.SHIPPED]: "Your item has been shipped",
       [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Your item is out for delivery",
