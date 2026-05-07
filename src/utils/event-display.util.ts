@@ -28,7 +28,7 @@ export const getEventDisplayInfo = (
     },
     [OrderEventTypeV2.ORDER_CONFIRMED]: {
       title: "Order Confirmed",
-      description: "Your order has been confirmed by the boutique",
+      description: "Your order has been confirmed by the designer",
       icon: "✅",
       color: "#4CAF50",
     },
@@ -46,7 +46,7 @@ export const getEventDisplayInfo = (
     },
     [OrderEventTypeV2.ITEM_CONFIRMED]: {
       title: "Order Confirmed",
-      description: "Your order has been confirmed by the boutique",
+      description: "Your order has been confirmed by the designer",
       icon: "✅",
       color: "#4CAF50",
     },

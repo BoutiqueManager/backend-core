@@ -6,7 +6,6 @@
 /** Top-level order status, computed from item statuses per PRD global rules. */
 export enum OrderStatusV2 {
   NEW = "NEW",
-  CONFIRMED = "CONFIRMED",
   IN_PROGRESS = "IN_PROGRESS",
   SHIPPED = "SHIPPED",
   OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
@@ -292,11 +291,7 @@ export const getNextPossibleOrderStatuses = (
   currentStatus: OrderStatusV2,
 ): OrderStatusV2[] => {
   const statusFlow: Record<OrderStatusV2, OrderStatusV2[]> = {
-    [OrderStatusV2.NEW]: [OrderStatusV2.CONFIRMED, OrderStatusV2.CANCELLED],
-    [OrderStatusV2.CONFIRMED]: [
-      OrderStatusV2.IN_PROGRESS,
-      OrderStatusV2.CANCELLED,
-    ],
+    [OrderStatusV2.NEW]: [OrderStatusV2.IN_PROGRESS, OrderStatusV2.CANCELLED],
     [OrderStatusV2.IN_PROGRESS]: [
       OrderStatusV2.SHIPPED,
       OrderStatusV2.CANCELLED,
@@ -331,7 +326,7 @@ export const getNextPossibleItemStatuses = (
 ): OrderItemStatusV2[] => {
   const statusFlow: Record<OrderItemStatusV2, OrderItemStatusV2[]> = {
     [OrderItemStatusV2.NEW]: [
-      OrderItemStatusV2.CONFIRMED,
+      OrderItemStatusV2.IN_PROGRESS,
       OrderItemStatusV2.CANCELLED,
     ],
     [OrderItemStatusV2.CONFIRMED]: [
@@ -442,7 +437,6 @@ export const isItemStatusFinal = (status: OrderItemStatusV2): boolean => {
  */
 export const ORDER_STATUS_DISPLAY_NAMES: Record<OrderStatusV2, string> = {
   [OrderStatusV2.NEW]: "New",
-  [OrderStatusV2.CONFIRMED]: "Confirmed",
   [OrderStatusV2.IN_PROGRESS]: "In Progress",
   [OrderStatusV2.SHIPPED]: "Shipped",
   [OrderStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
