@@ -45,6 +45,11 @@ export enum OrderItemStatusV2 {
   EXCHANGE_DELIVERED = "EXCHANGE_DELIVERED",
   EXCHANGED = "EXCHANGED",
   EXCHANGE_REJECTED = "EXCHANGE_REJECTED",
+
+  // Refund Process for Each item level status
+  REFUND_INITIATED = "REFUND_INITIATED",
+  REFUND_CREDITED = "REFUND_CREDITED",
+  REFUND_FAILED = "REFUND_FAILED",
 }
 
 /** Whether item is ready_to_ship or made_to_measure (customized). */
@@ -389,6 +394,14 @@ export const getNextPossibleItemStatuses = (
     [OrderItemStatusV2.EXCHANGE_DELIVERED]: [OrderItemStatusV2.EXCHANGED],
     [OrderItemStatusV2.EXCHANGED]: [],
     [OrderItemStatusV2.EXCHANGE_REJECTED]: [],
+
+    // Refund flow
+    [OrderItemStatusV2.REFUND_INITIATED]: [
+      OrderItemStatusV2.REFUND_CREDITED,
+      OrderItemStatusV2.REFUND_FAILED,
+    ],
+    [OrderItemStatusV2.REFUND_CREDITED]: [],
+    [OrderItemStatusV2.REFUND_FAILED]: [],
   };
 
   return statusFlow[currentStatus] || [];
@@ -473,6 +486,9 @@ export const ORDER_ITEM_STATUS_DISPLAY_NAMES: Record<
   [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
   [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup for logistics",
   [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup has been Scheduled",
+  [OrderItemStatusV2.REFUND_INITIATED]: "Refund Initiated",
+  [OrderItemStatusV2.REFUND_CREDITED]: "Refund Credited",
+  [OrderItemStatusV2.REFUND_FAILED]: "Refund Failed",
 };
 
 /**
