@@ -62,6 +62,18 @@ export const getEventDisplayInfo = (
       icon: "📦",
       color: "#2196F3",
     },
+    [OrderEventTypeV2.PICKUP_REQUESTED]: {
+      title: "Pickup Requested",
+      description: "Seller has packed the item and requested a logistics pickup",
+      icon: "🏷️",
+      color: "#2196F3",
+    },
+    [OrderEventTypeV2.PICKUP_CONFIRMED]: {
+      title: "Pickup Confirmed",
+      description: "Logistics has confirmed and scheduled the pickup slot",
+      icon: "🚐",
+      color: "#1565C0",
+    },
     [OrderEventTypeV2.ITEM_SHIPPED]: {
       title: "Shipped",
       description: "Your item has been dispatched",

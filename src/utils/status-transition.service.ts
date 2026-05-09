@@ -16,8 +16,8 @@ export class StatusTransitionService {
     {
       [OrderItemStatusV2.NEW]: OrderEventTypeV2.ORDER_PLACED,
       [OrderItemStatusV2.IN_PROGRESS]: OrderEventTypeV2.IN_PROGRESS,
-      [OrderItemStatusV2.SCHEDULED_PICKUP]: OrderEventTypeV2.READY_TO_SHIP,
-      [OrderItemStatusV2.PICKUP_SCHEDULED]: OrderEventTypeV2.READY_TO_SHIP,
+      [OrderItemStatusV2.SCHEDULED_PICKUP]: OrderEventTypeV2.PICKUP_REQUESTED,
+      [OrderItemStatusV2.PICKUP_SCHEDULED]: OrderEventTypeV2.PICKUP_CONFIRMED,
       [OrderItemStatusV2.SHIPPED]: OrderEventTypeV2.ITEM_SHIPPED,
       [OrderItemStatusV2.OUT_FOR_DELIVERY]:
         OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
@@ -48,6 +48,9 @@ export class StatusTransitionService {
       [OrderItemStatusV2.EXCHANGE_DELIVERED]: OrderEventTypeV2.ITEM_DELIVERED,
       [OrderItemStatusV2.EXCHANGED]: OrderEventTypeV2.EXCHANGED,
       [OrderItemStatusV2.EXCHANGE_REJECTED]: OrderEventTypeV2.STATUS_CHANGED,
+      [OrderItemStatusV2.REFUND_INITIATED]: OrderEventTypeV2.ORDER_PLACED,
+      [OrderItemStatusV2.REFUND_CREDITED]: OrderEventTypeV2.ORDER_PLACED,
+      [OrderItemStatusV2.REFUND_FAILED]: OrderEventTypeV2.ORDER_PLACED,
     };
 
   /**
@@ -72,7 +75,7 @@ export class StatusTransitionService {
       [OrderItemStatusV2.SCHEDULED_PICKUP]:
         "Pickup has been scheduled for your item",
       [OrderItemStatusV2.PICKUP_SCHEDULED]:
-        "Logistics pickup is being assigned to pick up your item",
+        "Logistics partner is being assigned to pick up your item",
       [OrderItemStatusV2.SHIPPED]: "Your item has been shipped",
       [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Your item is out for delivery",
       [OrderItemStatusV2.DELIVERED]:
@@ -107,6 +110,9 @@ export class StatusTransitionService {
       [OrderItemStatusV2.EXCHANGED]: "Item has been exchanged successfully",
       [OrderItemStatusV2.EXCHANGE_REJECTED]:
         "Exchange request has been rejected",
+      [OrderItemStatusV2.REFUND_INITIATED]: "Refund request has been initiated",
+      [OrderItemStatusV2.REFUND_CREDITED]: "Refund has been credited",
+      [OrderItemStatusV2.REFUND_FAILED]: "Refund request has failed",
     };
 
     return descriptions[toStatus] || `Status changed to ${toStatus}`;
