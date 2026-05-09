@@ -6,3 +6,4 @@ export * from "./utils/address.util";
 export * from "./utils/order-calculations.util";
 export * from "./utils/event-display.util";
 export * from "./utils/status-transition.service";
+export * from "./utils/order-status.util";
