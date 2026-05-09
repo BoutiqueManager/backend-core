@@ -45,9 +45,9 @@ export class V2ReverseShipment {
   customerId: string;
 
   // ─── Pickup Address (immutable — always original delivery address) ─────────
-  /** FK to customer_addresses */
-  @Column({ type: "uuid" })
-  pickupAddressId: string;
+
+  @Column({ type: "uuid", nullable: true })
+  pickupAddressId: string | null;
 
   /** Immutable address snapshot — locked at creation, never changes */
   @Column({ type: "jsonb" })
