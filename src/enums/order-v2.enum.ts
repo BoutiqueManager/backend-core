@@ -362,9 +362,16 @@ export const getNextPossibleItemStatuses = (
       OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER,
     ],
     [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]: [
-      OrderItemStatusV2.RETURNED,
+      OrderItemStatusV2.REFUND_INITIATED,
       OrderItemStatusV2.RETURN_REJECTED, // Seller inspects and rejects
     ],
+    [OrderItemStatusV2.REFUND_INITIATED]: [
+      OrderItemStatusV2.REFUND_CREDITED,
+      OrderItemStatusV2.REFUND_FAILED,
+    ],
+    [OrderItemStatusV2.REFUND_CREDITED]: [OrderItemStatusV2.RETURNED],
+    [OrderItemStatusV2.REFUND_FAILED]: [OrderItemStatusV2.RETURNED],
+
     [OrderItemStatusV2.RETURNED]: [],
     [OrderItemStatusV2.RETURN_REJECTED]: [],
     // ── Exchange flow ─────────────────────────────────────────────────────────
@@ -396,12 +403,6 @@ export const getNextPossibleItemStatuses = (
     [OrderItemStatusV2.EXCHANGE_REJECTED]: [],
 
     // Refund flow
-    [OrderItemStatusV2.REFUND_INITIATED]: [
-      OrderItemStatusV2.REFUND_CREDITED,
-      OrderItemStatusV2.REFUND_FAILED,
-    ],
-    [OrderItemStatusV2.REFUND_CREDITED]: [],
-    [OrderItemStatusV2.REFUND_FAILED]: [],
   };
 
   return statusFlow[currentStatus] || [];
