@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./blacklisted-token.entity"), exports);
 __exportStar(require("./order-v2"), exports);
 __exportStar(require("./boutique-size-guide.entity"), exports);
+__exportStar(require("./product-categories.entity"), exports);
 //# sourceMappingURL=index.js.map
