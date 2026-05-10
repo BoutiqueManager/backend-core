@@ -11,13 +11,15 @@ import { OrderItemStatusV2, OrderStatusV2 } from "../enums/order-v2.enum";
  *  1. ALL items CANCELLED                         → CANCELLED
  *  2. All non-cancelled items DELIVERED (partial) → PARTIALLY_CANCELLED
  *  3. All non-cancelled items DELIVERED (full)    → DELIVERED
- *  4. ALL items RETURNED                          → RETURNED
- *  5. ALL items EXCHANGED                         → EXCHANGED
+ *  4. ALL active items RETURNED/RECEIVED_BY_SELLER/REFUNDED → RETURNED (TERMINAL)
+ *  5. ALL active items EXCHANGED                  → EXCHANGED
+ *  5.5. Mixed terminal states with ANY RETURNED/REFUND → RETURNED (highest priority)
  *  6. Any item in an active transition state
  *     (IN_PROGRESS / SCHEDULED_PICKUP / PICKUP_SCHEDULED /
  *      OUT_FOR_DELIVERY / SHIPPED /
- *      RETURN_* except RETURNED/RETURN_REJECTED /
+ *      RETURN_INITIATED / RETURN_PICKUP_SCHEDULED / RETURN_PICKED_UP / RETURN_IN_TRANSIT /
  *      EXCHANGE_* except EXCHANGED/EXCHANGE_REJECTED)  → IN_PROGRESS
+ *     NOTE: RETURN_RECEIVED_BY_SELLER is TERMINAL, not a transition
  *  7. ALL items NEW                               → NEW
  *  8. Mixed / unresolvable                        → null (caller keeps current)
  */
@@ -167,21 +169,38 @@ export function computeOrderStatusFromItemStatuses(
   }
 
   // ── Rule 4: ALL active items RETURNED or REFUNDED (terminal return) ────────
-  // Refund statuses (REFUND_INITIATED/CREDITED/FAILED) are also terminal return
-  // states, so count them alongside RETURNED.
-  if (
-    returnedCount + refundCount === activeCount &&
-    returnedCount + refundCount > 0
-  ) {
+  // Once item is received by seller, it's in a terminal return state.
+  // Refund statuses (REFUND_INITIATED/CREDITED/FAILED) are also terminal return states.
+  const terminalReturnCount =
+    returnedCount + returnReceivedBySellerCount + refundCount;
+
+  if (terminalReturnCount === activeCount && terminalReturnCount > 0) {
     return OrderStatusV2.RETURNED;
   }
 
   // ── Rule 5: ALL active items EXCHANGED (terminal exchange) ────────────────
   if (exchangedCount === activeCount) return OrderStatusV2.EXCHANGED;
 
+  // ── Rule 5.5: Mixed terminal states with ANY return/refund → RETURNED ──────
+  // If all items are in terminal states (DELIVERED, RETURNED, REFUND_*, EXCHANGED, etc.)
+  // and at least one is in a return/refund terminal state, then RETURNED is the highest priority
+  const terminalStateCount =
+    deliveredCount +
+    terminalReturnCount +
+    exchangedCount +
+    returnRejectedCount +
+    exchangeRejectedCount;
+
+  if (terminalStateCount === activeCount && terminalReturnCount > 0) {
+    // All items are in final states, and at least one is RETURNED or REFUND_*
+    // RETURNED is the most advanced/highest priority status
+    return OrderStatusV2.RETURNED;
+  }
+
   // ── Rule 6: Any item in an ACTIVE transition state → IN_PROGRESS ──────────
   // This covers the forward fulfilment flow and all mid-flight return/exchange
   // steps (not yet at a terminal status).
+  // NOTE: RETURN_RECEIVED_BY_SELLER is a TERMINAL state (removed from active transitions)
   const hasActiveTransition =
     inProgressCount > 0 ||
     scheduledPickupCount > 0 ||
@@ -192,7 +211,6 @@ export function computeOrderStatusFromItemStatuses(
     returnPickupScheduledCount > 0 ||
     returnPickedUpCount > 0 ||
     returnInTransitCount > 0 ||
-    returnReceivedBySellerCount > 0 ||
     exchangeInitiatedCount > 0 ||
     exchangePickupScheduledCount > 0 ||
     exchangePickedUpCount > 0 ||
