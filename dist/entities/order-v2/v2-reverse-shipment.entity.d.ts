@@ -18,8 +18,7 @@ export declare class V2ReverseShipment {
     returnOrderId: string;
     exchangeOrderId: string;
     customerId: string;
-    /** FK to customer_addresses */
-    pickupAddressId: string;
+    pickupAddressId: string | null;
     /** Immutable address snapshot — locked at creation, never changes */
     pickupAddress: Record<string, any>;
     logisticsProvider: string;

@@ -19,7 +19,9 @@ __exportStar(require("./types"), exports);
 // export * from "./entities";
 __exportStar(require("./constants/ImageTypes"), exports);
 __exportStar(require("./utils/address.util"), exports);
+__exportStar(require("./utils/date-formatter.util"), exports);
 __exportStar(require("./utils/order-calculations.util"), exports);
 __exportStar(require("./utils/event-display.util"), exports);
 __exportStar(require("./utils/status-transition.service"), exports);
+__exportStar(require("./utils/order-status.util"), exports);
 //# sourceMappingURL=index.js.map

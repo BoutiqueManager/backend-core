@@ -5,7 +5,6 @@ var OrderStatusEnum;
 (function (OrderStatusEnum) {
     OrderStatusEnum["NEW"] = "NEW";
     OrderStatusEnum["IN_PROGRESS"] = "IN_PROGRESS";
-    OrderStatusEnum["LOGISTICS_APPROVAL_PENDING"] = "LOGISTICS_APPROVAL_PENDING";
     OrderStatusEnum["SHIPPED"] = "SHIPPED";
     OrderStatusEnum["DELIVERED"] = "DELIVERED";
     OrderStatusEnum["CANCELLED"] = "CANCELLED";

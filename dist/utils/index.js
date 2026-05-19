@@ -15,6 +15,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./address.util"), exports);
+__exportStar(require("./date-formatter.util"), exports);
 __exportStar(require("./event-display.util"), exports);
 __exportStar(require("./order-calculations.util"), exports);
 __exportStar(require("./status-transition.service"), exports);

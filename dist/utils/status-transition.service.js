@@ -21,7 +21,7 @@ class StatusTransitionService {
             [order_v2_enum_1.OrderItemStatusV2.NEW]: "Order has been placed",
             [order_v2_enum_1.OrderItemStatusV2.IN_PROGRESS]: "Your item is being prepared/customized",
             [order_v2_enum_1.OrderItemStatusV2.SCHEDULED_PICKUP]: "Pickup has been scheduled for your item",
-            [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup is scheduled for your item",
+            [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: "Logistics partner is being assigned to pick up your item",
             [order_v2_enum_1.OrderItemStatusV2.SHIPPED]: "Your item has been shipped",
             [order_v2_enum_1.OrderItemStatusV2.OUT_FOR_DELIVERY]: "Your item is out for delivery",
             [order_v2_enum_1.OrderItemStatusV2.DELIVERED]: "Your item has been delivered successfully",
@@ -45,6 +45,9 @@ class StatusTransitionService {
             [order_v2_enum_1.OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange item has been delivered",
             [order_v2_enum_1.OrderItemStatusV2.EXCHANGED]: "Item has been exchanged successfully",
             [order_v2_enum_1.OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange request has been rejected",
+            [order_v2_enum_1.OrderItemStatusV2.REFUND_INITIATED]: "Refund request has been initiated",
+            [order_v2_enum_1.OrderItemStatusV2.REFUND_CREDITED]: "Refund has been credited",
+            [order_v2_enum_1.OrderItemStatusV2.REFUND_FAILED]: "Refund request has failed",
         };
         return descriptions[toStatus] || `Status changed to ${toStatus}`;
     }
@@ -68,8 +71,8 @@ exports.StatusTransitionService = StatusTransitionService;
 StatusTransitionService.statusToEventMap = {
     [order_v2_enum_1.OrderItemStatusV2.NEW]: order_v2_enum_1.OrderEventTypeV2.ORDER_PLACED,
     [order_v2_enum_1.OrderItemStatusV2.IN_PROGRESS]: order_v2_enum_1.OrderEventTypeV2.IN_PROGRESS,
-    [order_v2_enum_1.OrderItemStatusV2.SCHEDULED_PICKUP]: order_v2_enum_1.OrderEventTypeV2.READY_TO_SHIP,
-    [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: order_v2_enum_1.OrderEventTypeV2.READY_TO_SHIP,
+    [order_v2_enum_1.OrderItemStatusV2.SCHEDULED_PICKUP]: order_v2_enum_1.OrderEventTypeV2.PICKUP_REQUESTED,
+    [order_v2_enum_1.OrderItemStatusV2.PICKUP_SCHEDULED]: order_v2_enum_1.OrderEventTypeV2.PICKUP_CONFIRMED,
     [order_v2_enum_1.OrderItemStatusV2.SHIPPED]: order_v2_enum_1.OrderEventTypeV2.ITEM_SHIPPED,
     [order_v2_enum_1.OrderItemStatusV2.OUT_FOR_DELIVERY]: order_v2_enum_1.OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
     [order_v2_enum_1.OrderItemStatusV2.DELIVERED]: order_v2_enum_1.OrderEventTypeV2.ITEM_DELIVERED,
@@ -91,5 +94,8 @@ StatusTransitionService.statusToEventMap = {
     [order_v2_enum_1.OrderItemStatusV2.EXCHANGE_DELIVERED]: order_v2_enum_1.OrderEventTypeV2.ITEM_DELIVERED,
     [order_v2_enum_1.OrderItemStatusV2.EXCHANGED]: order_v2_enum_1.OrderEventTypeV2.EXCHANGED,
     [order_v2_enum_1.OrderItemStatusV2.EXCHANGE_REJECTED]: order_v2_enum_1.OrderEventTypeV2.STATUS_CHANGED,
+    [order_v2_enum_1.OrderItemStatusV2.REFUND_INITIATED]: order_v2_enum_1.OrderEventTypeV2.ORDER_PLACED,
+    [order_v2_enum_1.OrderItemStatusV2.REFUND_CREDITED]: order_v2_enum_1.OrderEventTypeV2.ORDER_PLACED,
+    [order_v2_enum_1.OrderItemStatusV2.REFUND_FAILED]: order_v2_enum_1.OrderEventTypeV2.ORDER_PLACED,
 };
 //# sourceMappingURL=status-transition.service.js.map
