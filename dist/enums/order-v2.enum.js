@@ -48,6 +48,10 @@ var OrderItemStatusV2;
     OrderItemStatusV2["EXCHANGE_DELIVERED"] = "EXCHANGE_DELIVERED";
     OrderItemStatusV2["EXCHANGED"] = "EXCHANGED";
     OrderItemStatusV2["EXCHANGE_REJECTED"] = "EXCHANGE_REJECTED";
+    // Refund Process for Each item level status
+    OrderItemStatusV2["REFUND_INITIATED"] = "REFUND_INITIATED";
+    OrderItemStatusV2["REFUND_CREDITED"] = "REFUND_CREDITED";
+    OrderItemStatusV2["REFUND_FAILED"] = "REFUND_FAILED";
 })(OrderItemStatusV2 || (exports.OrderItemStatusV2 = OrderItemStatusV2 = {}));
 /** Whether item is ready_to_ship or made_to_measure (customized). */
 var ProductTypeV2;
@@ -201,6 +205,8 @@ var OrderEventTypeV2;
     OrderEventTypeV2["ITEM_CONFIRMED"] = "ITEM_CONFIRMED";
     OrderEventTypeV2["IN_PROGRESS"] = "IN_PROGRESS";
     OrderEventTypeV2["READY_TO_SHIP"] = "READY_TO_SHIP";
+    OrderEventTypeV2["PICKUP_REQUESTED"] = "PICKUP_REQUESTED";
+    OrderEventTypeV2["PICKUP_CONFIRMED"] = "PICKUP_CONFIRMED";
     OrderEventTypeV2["ITEM_SHIPPED"] = "ITEM_SHIPPED";
     OrderEventTypeV2["ITEM_OUT_FOR_DELIVERY"] = "ITEM_OUT_FOR_DELIVERY";
     OrderEventTypeV2["ITEM_DELIVERED"] = "ITEM_DELIVERED";
@@ -346,9 +352,15 @@ const getNextPossibleItemStatuses = (currentStatus) => {
             OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER,
         ],
         [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]: [
-            OrderItemStatusV2.RETURNED,
+            OrderItemStatusV2.REFUND_INITIATED,
             OrderItemStatusV2.RETURN_REJECTED, // Seller inspects and rejects
         ],
+        [OrderItemStatusV2.REFUND_INITIATED]: [
+            OrderItemStatusV2.REFUND_CREDITED,
+            OrderItemStatusV2.REFUND_FAILED,
+        ],
+        [OrderItemStatusV2.REFUND_CREDITED]: [OrderItemStatusV2.RETURNED],
+        [OrderItemStatusV2.REFUND_FAILED]: [OrderItemStatusV2.RETURNED],
         [OrderItemStatusV2.RETURNED]: [],
         [OrderItemStatusV2.RETURN_REJECTED]: [],
         // ── Exchange flow ─────────────────────────────────────────────────────────
@@ -378,6 +390,7 @@ const getNextPossibleItemStatuses = (currentStatus) => {
         [OrderItemStatusV2.EXCHANGE_DELIVERED]: [OrderItemStatusV2.EXCHANGED],
         [OrderItemStatusV2.EXCHANGED]: [],
         [OrderItemStatusV2.EXCHANGE_REJECTED]: [],
+        // Refund flow
     };
     return statusFlow[currentStatus] || [];
 };
@@ -452,8 +465,11 @@ exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange Delivered",
     [OrderItemStatusV2.EXCHANGED]: "Exchanged",
     [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
-    [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup",
-    [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup Scheduled",
+    [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup for logistics",
+    [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup has been Scheduled",
+    [OrderItemStatusV2.REFUND_INITIATED]: "Refund Initiated",
+    [OrderItemStatusV2.REFUND_CREDITED]: "Refund Credited",
+    [OrderItemStatusV2.REFUND_FAILED]: "Refund Failed",
 };
 /**
  * Convert OrderStatusV2 enum value to display name
