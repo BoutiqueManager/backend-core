@@ -34,6 +34,7 @@ export interface OrderV2ItemSummary {
   isCustomized?: boolean;
   selectedSize?: string | null;
   customizationOptions?: Record<string, any> | null;
+  measurementSnapshot?: Record<string, any> | null;
   quantity: number;
   pricing: {
     mrp: number;
@@ -134,6 +135,7 @@ export interface OrderItemDetailV2 {
   isCustomized: boolean;
   selectedSize: string | null;
   customizationOptions: Record<string, any> | null;
+  measurementSnapshot: Record<string, any> | null;
   quantity: number;
   pricing: {
     mrp: number;
