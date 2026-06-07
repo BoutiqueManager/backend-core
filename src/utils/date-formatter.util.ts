@@ -43,6 +43,11 @@ export interface IsoDateRange {
   endDate: string; // ISO string with IST offset, e.g., "2026-06-14T23:59:59+05:30"
 }
 
+export interface DateOnlyRange {
+  startDate: string; // Date-only string YYYY-MM-DD (interpreted as IST calendar date)
+  endDate: string; // Date-only string YYYY-MM-DD (interpreted as IST calendar date)
+}
+
 /**
  * Converts any date input (interpreted as an IST calendar date) to
  * the UTC instant of IST midnight (00:00:00.000 IST) for that day.
@@ -86,24 +91,33 @@ export function parseDateRangeToUtc(
 }
 
 /**
- * Returns the current IST week (Monday–Sunday) as ISO strings with IST timezone offset.
- * UI can send these directly to the backend, which will convert to UTC for DB queries.
+ * Returns the current IST week (Monday–Sunday) as date-only strings (YYYY-MM-DD).
+ * Backend interprets these as IST calendar dates and converts to UTC for DB queries.
  *
  * Example output (when called on Monday Jun 8, 2026):
  *   {
- *     startDate: "2026-06-08T00:00:00+05:30",  // Mon 00:00 IST
- *     endDate: "2026-06-14T23:59:59+05:30"    // Sun 23:59 IST
+ *     startDate: "2026-06-08",  // Mon
+ *     endDate: "2026-06-14"    // Sun
  *   }
  */
-export function getCurrentIstWeekRange(): IsoDateRange {
+export function getCurrentIstWeekRange(): DateOnlyRange {
   const now = new Date();
 
-  // IST day-of-week (1=Mon … 7=Sun)
-  // Get UTC day, add IST offset, then normalize to 1-7 (Mon-Sun)
-  const utcDay = now.getUTCDay();
-  const istDay =
-    (utcDay + Math.floor(IST_OFFSET_MS / (1000 * 60 * 60) + 24)) % 7;
-  const istWeekday = istDay === 0 ? 7 : istDay; // Convert 0=Sun to 7, 1=Mon stays 1
+  // IST day-of-week (1=Mon … 7=Sun) using Intl for correct timezone conversion
+  const istDayName = new Intl.DateTimeFormat("en-US", {
+    timeZone: IST,
+    weekday: "long",
+  }).format(now);
+  const dayMap: Record<string, number> = {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+    Sunday: 7,
+  };
+  const istWeekday = dayMap[istDayName];
   const daysFromMonday = istWeekday === 7 ? 6 : istWeekday - 1;
 
   // IST calendar date parts for today
@@ -126,47 +140,41 @@ export function getCurrentIstWeekRange(): IsoDateRange {
     10,
   );
 
-  // IST Monday (00:00:00)
+  // IST Monday
   const istMonday = new Date(
     Date.UTC(year, month - 1, day, 0, 0, 0) - IST_OFFSET_MS,
   );
   istMonday.setDate(istMonday.getDate() - daysFromMonday);
 
-  // IST Sunday (23:59:59)
+  // IST Sunday
   const istSunday = new Date(istMonday);
   istSunday.setDate(istMonday.getDate() + 6);
-  istSunday.setUTCHours(23, 59, 59, 999);
 
-  // Format as ISO strings with IST offset (+05:30)
-  const formatIstIso = (date: Date): string => {
-    const offset = "+05:30";
+  // Format as date-only strings (YYYY-MM-DD) - backend will interpret as IST calendar dates
+  const formatDateOnly = (date: Date): string => {
     const yyyy = date.getUTCFullYear();
     const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
     const dd = String(date.getUTCDate()).padStart(2, "0");
-    const hh = String(date.getUTCHours()).padStart(2, "0");
-    const mi = String(date.getUTCMinutes()).padStart(2, "0");
-    const ss = String(date.getUTCSeconds()).padStart(2, "0");
-    const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
-    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}.${ms}${offset}`;
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   return {
-    startDate: formatIstIso(istMonday),
-    endDate: formatIstIso(istSunday),
+    startDate: formatDateOnly(istMonday),
+    endDate: formatDateOnly(istSunday),
   };
 }
 
 /**
- * Returns the current IST month (1st–last day) as ISO strings with IST timezone offset.
- * UI can send these directly to the backend, which will convert to UTC for DB queries.
+ * Returns the current IST month (1st–last day) as date-only strings (YYYY-MM-DD).
+ * Backend interprets these as IST calendar dates and converts to UTC for DB queries.
  *
  * Example output (when called on Jun 8, 2026):
  *   {
- *     startDate: "2026-06-01T00:00:00+05:30",  // Jun 1 00:00 IST
- *     endDate: "2026-06-30T23:59:59+05:30"    // Jun 30 23:59 IST
+ *     startDate: "2026-06-01",  // Jun 1
+ *     endDate: "2026-06-30"    // Jun 30
  *   }
  */
-export function getCurrentIstMonthRange(): IsoDateRange {
+export function getCurrentIstMonthRange(): DateOnlyRange {
   const now = new Date();
 
   // IST calendar date parts for today
@@ -185,32 +193,69 @@ export function getCurrentIstMonthRange(): IsoDateRange {
     10,
   );
 
-  // IST 1st of month (00:00:00)
+  // IST 1st of month
   const istMonthStart = new Date(
     Date.UTC(year, month - 1, 1, 0, 0, 0) - IST_OFFSET_MS,
   );
 
-  // IST last day of month (23:59:59)
+  // IST last day of month
   const istMonthEnd = new Date(
     Date.UTC(year, month, 0, 23, 59, 59, 999) - IST_OFFSET_MS,
   );
 
-  // Format as ISO strings with IST offset (+05:30)
-  const formatIstIso = (date: Date): string => {
-    const offset = "+05:30";
+  // Format as date-only strings (YYYY-MM-DD) - backend will interpret as IST calendar dates
+  const formatDateOnly = (date: Date): string => {
     const yyyy = date.getUTCFullYear();
     const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
     const dd = String(date.getUTCDate()).padStart(2, "0");
-    const hh = String(date.getUTCHours()).padStart(2, "0");
-    const mi = String(date.getUTCMinutes()).padStart(2, "0");
-    const ss = String(date.getUTCSeconds()).padStart(2, "0");
-    const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
-    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}.${ms}${offset}`;
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   return {
-    startDate: formatIstIso(istMonthStart),
-    endDate: formatIstIso(istMonthEnd),
+    startDate: formatDateOnly(istMonthStart),
+    endDate: formatDateOnly(istMonthEnd),
+  };
+}
+
+/**
+ * Returns the current IST week (Monday–Sunday) as UTC ISO strings.
+ * Send these directly as API query params — the backend parses them
+ * straight into Date objects with no IST→UTC conversion needed.
+ *
+ * Example (called on Jun 7, 2026 IST):
+ *   { startDate: "2026-06-01T18:30:00.000Z",   // Mon Jun 2 00:00:00 IST
+ *     endDate:   "2026-06-08T18:29:59.999Z" }   // Sun Jun 8 23:59:59.999 IST
+ */
+export function getCurrentIstWeekRangeUtc(): {
+  startDate: string;
+  endDate: string;
+} {
+  const { startDate, endDate } = getCurrentIstWeekRange();
+  const utc = parseDateRangeToUtc(startDate, endDate);
+  return {
+    startDate: utc.startDate.toISOString(),
+    endDate: utc.endDate.toISOString(),
+  };
+}
+
+/**
+ * Returns the current IST month (1st–last day) as UTC ISO strings.
+ * Send these directly as API query params — the backend parses them
+ * straight into Date objects with no IST→UTC conversion needed.
+ *
+ * Example (called in Jun 2026):
+ *   { startDate: "2026-05-31T18:30:00.000Z",   // Jun 1 00:00:00 IST
+ *     endDate:   "2026-06-30T18:29:59.999Z" }   // Jun 30 23:59:59.999 IST
+ */
+export function getCurrentIstMonthRangeUtc(): {
+  startDate: string;
+  endDate: string;
+} {
+  const { startDate, endDate } = getCurrentIstMonthRange();
+  const utc = parseDateRangeToUtc(startDate, endDate);
+  return {
+    startDate: utc.startDate.toISOString(),
+    endDate: utc.endDate.toISOString(),
   };
 }
 
