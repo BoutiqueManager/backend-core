@@ -12,8 +12,236 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const IST = "Asia/Kolkata";
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000; // 5:30 hours in milliseconds
 
 export type DateInput = string | Date | null | undefined;
+
+// ─── IST → UTC boundary helpers (for DB queries) ─────────────────────────────
+//
+// Use these when the caller provides a date that represents an IST calendar
+// day and you need exact UTC timestamps to BETWEEN-query a UTC database.
+//
+// All three accept any DateInput format:
+//   "2026-06-01"             YYYY-MM-DD
+//   "1 Jun 2026"             human-readable
+//   "2026-06-01T18:30:00Z"   ISO timestamp
+//   Date object
+//
+// Examples (IST = UTC+5:30):
+//   toUtcStartOfDay("2026-06-01")
+//     → 2026-05-31T18:30:00.000Z  (Jun 1 00:00 IST)
+//   toUtcEndOfDay("2026-06-07")
+//     → 2026-06-07T18:29:59.999Z  (Jun 7 23:59:59.999 IST)
+
+export interface ParsedDateRange {
+  startDate: Date;
+  endDate: Date;
+}
+
+export interface IsoDateRange {
+  startDate: string; // ISO string with IST offset, e.g., "2026-06-08T00:00:00+05:30"
+  endDate: string; // ISO string with IST offset, e.g., "2026-06-14T23:59:59+05:30"
+}
+
+/**
+ * Converts any date input (interpreted as an IST calendar date) to
+ * the UTC instant of IST midnight (00:00:00.000 IST) for that day.
+ * Use as the lower bound of a DB date-range query.
+ */
+export function toUtcStartOfDay(input: DateInput): Date {
+  const { year, month, day } = extractIstDateParts(input);
+  // IST 00:00:00.000 → UTC: subtract 5 h 30 m
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0) - IST_OFFSET_MS);
+}
+
+/**
+ * Converts any date input (interpreted as an IST calendar date) to
+ * the UTC instant of IST end-of-day (23:59:59.999 IST) for that day.
+ * Use as the upper bound of a DB date-range query.
+ */
+export function toUtcEndOfDay(input: DateInput): Date {
+  const { year, month, day } = extractIstDateParts(input);
+  // IST 23:59:59.999 → UTC: subtract 5 h 30 m
+  return new Date(
+    Date.UTC(year, month - 1, day, 23, 59, 59, 999) - IST_OFFSET_MS,
+  );
+}
+
+/**
+ * Convenience wrapper — returns UTC start-of-day for startInput and
+ * UTC end-of-day for endInput in one call.
+ *
+ * Usage:
+ *   const { startDate, endDate } = parseDateRangeToUtc(startDate, endDate);
+ *   // use startDate / endDate directly in TypeORM BETWEEN queries
+ */
+export function parseDateRangeToUtc(
+  startInput: DateInput,
+  endInput: DateInput,
+): ParsedDateRange {
+  return {
+    startDate: toUtcStartOfDay(startInput),
+    endDate: toUtcEndOfDay(endInput),
+  };
+}
+
+/**
+ * Returns the current IST week (Monday–Sunday) as ISO strings with IST timezone offset.
+ * UI can send these directly to the backend, which will convert to UTC for DB queries.
+ *
+ * Example output (when called on Monday Jun 8, 2026):
+ *   {
+ *     startDate: "2026-06-08T00:00:00+05:30",  // Mon 00:00 IST
+ *     endDate: "2026-06-14T23:59:59+05:30"    // Sun 23:59 IST
+ *   }
+ */
+export function getCurrentIstWeekRange(): IsoDateRange {
+  const now = new Date();
+
+  // IST day-of-week (1=Mon … 7=Sun)
+  // Get UTC day, add IST offset, then normalize to 1-7 (Mon-Sun)
+  const utcDay = now.getUTCDay();
+  const istDay =
+    (utcDay + Math.floor(IST_OFFSET_MS / (1000 * 60 * 60) + 24)) % 7;
+  const istWeekday = istDay === 0 ? 7 : istDay; // Convert 0=Sun to 7, 1=Mon stays 1
+  const daysFromMonday = istWeekday === 7 ? 6 : istWeekday - 1;
+
+  // IST calendar date parts for today
+  const istParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: IST,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const year = parseInt(
+    istParts.find((p) => p.type === "year")?.value ?? "0",
+    10,
+  );
+  const month = parseInt(
+    istParts.find((p) => p.type === "month")?.value ?? "0",
+    10,
+  );
+  const day = parseInt(
+    istParts.find((p) => p.type === "day")?.value ?? "0",
+    10,
+  );
+
+  // IST Monday (00:00:00)
+  const istMonday = new Date(
+    Date.UTC(year, month - 1, day, 0, 0, 0) - IST_OFFSET_MS,
+  );
+  istMonday.setDate(istMonday.getDate() - daysFromMonday);
+
+  // IST Sunday (23:59:59)
+  const istSunday = new Date(istMonday);
+  istSunday.setDate(istMonday.getDate() + 6);
+  istSunday.setUTCHours(23, 59, 59, 999);
+
+  // Format as ISO strings with IST offset (+05:30)
+  const formatIstIso = (date: Date): string => {
+    const offset = "+05:30";
+    const yyyy = date.getUTCFullYear();
+    const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(date.getUTCDate()).padStart(2, "0");
+    const hh = String(date.getUTCHours()).padStart(2, "0");
+    const mi = String(date.getUTCMinutes()).padStart(2, "0");
+    const ss = String(date.getUTCSeconds()).padStart(2, "0");
+    const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}.${ms}${offset}`;
+  };
+
+  return {
+    startDate: formatIstIso(istMonday),
+    endDate: formatIstIso(istSunday),
+  };
+}
+
+/**
+ * Returns the current IST month (1st–last day) as ISO strings with IST timezone offset.
+ * UI can send these directly to the backend, which will convert to UTC for DB queries.
+ *
+ * Example output (when called on Jun 8, 2026):
+ *   {
+ *     startDate: "2026-06-01T00:00:00+05:30",  // Jun 1 00:00 IST
+ *     endDate: "2026-06-30T23:59:59+05:30"    // Jun 30 23:59 IST
+ *   }
+ */
+export function getCurrentIstMonthRange(): IsoDateRange {
+  const now = new Date();
+
+  // IST calendar date parts for today
+  const istParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: IST,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const year = parseInt(
+    istParts.find((p) => p.type === "year")?.value ?? "0",
+    10,
+  );
+  const month = parseInt(
+    istParts.find((p) => p.type === "month")?.value ?? "0",
+    10,
+  );
+
+  // IST 1st of month (00:00:00)
+  const istMonthStart = new Date(
+    Date.UTC(year, month - 1, 1, 0, 0, 0) - IST_OFFSET_MS,
+  );
+
+  // IST last day of month (23:59:59)
+  const istMonthEnd = new Date(
+    Date.UTC(year, month, 0, 23, 59, 59, 999) - IST_OFFSET_MS,
+  );
+
+  // Format as ISO strings with IST offset (+05:30)
+  const formatIstIso = (date: Date): string => {
+    const offset = "+05:30";
+    const yyyy = date.getUTCFullYear();
+    const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(date.getUTCDate()).padStart(2, "0");
+    const hh = String(date.getUTCHours()).padStart(2, "0");
+    const mi = String(date.getUTCMinutes()).padStart(2, "0");
+    const ss = String(date.getUTCSeconds()).padStart(2, "0");
+    const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
+    return `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}.${ms}${offset}`;
+  };
+
+  return {
+    startDate: formatIstIso(istMonthStart),
+    endDate: formatIstIso(istMonthEnd),
+  };
+}
+
+/**
+ * Extracts the IST calendar date parts (year, month, day) from any DateInput.
+ * Uses Intl to project the UTC instant into Asia/Kolkata timezone.
+ */
+function extractIstDateParts(input: DateInput): {
+  year: number;
+  month: number;
+  day: number;
+} {
+  const d = toDate(input);
+  if (!d) throw new Error(`Cannot parse date: ${String(input)}`);
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: IST,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+
+  const year = parseInt(parts.find((p) => p.type === "year")?.value ?? "0", 10);
+  const month = parseInt(
+    parts.find((p) => p.type === "month")?.value ?? "0",
+    10,
+  );
+  const day = parseInt(parts.find((p) => p.type === "day")?.value ?? "0", 10);
+
+  return { year, month, day };
+}
 
 // ─── Input normalizer ─────────────────────────────────────────────────────────
 
