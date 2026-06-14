@@ -28,6 +28,7 @@ import {
  */
 @Entity("v2_refunds")
 @Index(["orderId"])
+@Index(["orderItemId"])
 @Index(["customerId"])
 @Index(["razorpayRefundId"])
 @Index(["returnOrderId"])
@@ -49,6 +50,10 @@ export class V2Refund {
 
   @Column({ type: "uuid" })
   orderId: string;
+
+  /** The specific order item this refund is for (cancellation refunds) */
+  @Column({ type: "uuid", nullable: true })
+  orderItemId: string;
 
   @Column({ type: "uuid" })
   checkoutSessionId: string;
