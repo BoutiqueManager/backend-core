@@ -70,6 +70,11 @@ export interface OrderV2ItemSummary {
   } | null;
   isRated?: boolean;
   ratingId?: string | null;
+  refundDetails?: {
+    refundStatus: RefundStatusV2 | null;
+    refundInitiatedAt: string | null;
+    refundCreditedAt: string | null;
+  } | null;
 }
 
 export interface OrderV2Summary {
@@ -153,10 +158,11 @@ export interface OrderItemDetailV2 {
   cancelledAt: string | null;
   cancelledBy: string | null;
   cancellationReason: string | null;
-  refundStatus?: RefundStatusV2 | null;
-  refundInitiatedAt?: string | null;
-  refundBankProcessedAt?: string | null;
-  refundCreditedAt?: string | null;
+  refundDetails?: {
+    refundStatus: RefundStatusV2 | null;
+    refundInitiatedAt: string | null;
+    refundCreditedAt: string | null;
+  } | null;
   tracking: Record<string, any> | null;
   returnStatus: string | null;
   exchangeStatus: string | null;

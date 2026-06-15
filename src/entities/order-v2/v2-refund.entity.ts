@@ -56,9 +56,6 @@ export class V2Refund {
   orderItemId: string;
 
   @Column({ type: "uuid" })
-  checkoutSessionId: string;
-
-  @Column({ type: "uuid" })
   customerId: string;
 
   // ─── Refund Type & Origin ─────────────────────────────────────────────────
@@ -76,16 +73,6 @@ export class V2Refund {
   // ─── Amount ───────────────────────────────────────────────────────────────
   @Column({ type: "decimal", precision: 12, scale: 2 })
   amount: number;
-
-  @Column({ type: "varchar", length: 3, default: "INR" })
-  currency: string;
-
-  /**
-   * Always true for return/exchange refunds per PRD §1.5.
-   * Shipping charges are excluded since item was successfully delivered.
-   */
-  @Column({ type: "boolean", default: true })
-  shippingChargesExcluded: boolean;
 
   // ─── Refund Destination (customer selects during return/exchange flow) ─────
   @Column({ type: "enum", enum: RefundDestination })
@@ -111,6 +98,10 @@ export class V2Refund {
   // ─── Razorpay ─────────────────────────────────────────────────────────────
   @Column({ type: "varchar", nullable: true })
   razorpayRefundId: string;
+
+  /** Full Razorpay refund API request payload for audit/debugging */
+  @Column({ type: "jsonb", nullable: true })
+  razorpayRequest: Record<string, any>;
 
   /** Full Razorpay refund API response for audit */
   @Column({ type: "jsonb", nullable: true })
