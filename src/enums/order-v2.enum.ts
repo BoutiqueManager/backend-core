@@ -273,6 +273,7 @@ export enum OrderMediaType {
 /** Who triggered a refund initiation. */
 export enum RefundInitiatedBy {
   SYSTEM = "system",
+  SCHEDULER = "scheduler",
   SELLER = "seller",
 }
 
