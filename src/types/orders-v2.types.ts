@@ -44,6 +44,8 @@ export interface OrderV2ItemSummary {
     taxPerItem: number;
     finalPricePerItem: number;
     totalFinalPrice: number;
+    advancePaid: number;
+    remainingAmount: number;
   };
   status: string;
   estimatedDeliveryDate?: string | null;
@@ -70,6 +72,7 @@ export interface OrderV2ItemSummary {
   } | null;
   isRated?: boolean;
   ratingId?: string | null;
+  updatedAt?: string | null;
   refundDetails?: {
     refundStatus: RefundStatusV2 | null;
     refundInitiatedAt: string | null;
