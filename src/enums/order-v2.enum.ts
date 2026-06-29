@@ -87,11 +87,8 @@ export enum OrderPaymentStatusV2 {
 }
 
 export enum PaymentMethodV2 {
-  UPI = "upi",
-  CARD = "card",
-  WALLET = "wallet",
   COD = "cod",
-  NETBANKING = "netbanking",
+  online = "online",
 }
 
 /**
