@@ -63,8 +63,6 @@ export enum PaymentTypeV2 {
   FULL = "full",
   PARTIAL = "partial",
   REMAINING_BALANCE = "remaining_balance",
-  EXCHANGE_TOP_UP = "exchange_top_up",
-  ADVANCE = "advance",
 }
 
 /** Granular Razorpay-aligned payment status. */
