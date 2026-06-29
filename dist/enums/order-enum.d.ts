@@ -1,9 +1,0 @@
-export declare enum OrderStatusEnum {
-    NEW = "NEW",
-    IN_PROGRESS = "IN_PROGRESS",
-    SHIPPED = "SHIPPED",
-    DELIVERED = "DELIVERED",
-    CANCELLED = "CANCELLED",
-    RETURN = "RETURN",
-    EXCHANGE = "EXCHANGE"
-}
