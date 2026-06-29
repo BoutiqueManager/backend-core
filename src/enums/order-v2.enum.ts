@@ -87,11 +87,45 @@ export enum OrderPaymentStatusV2 {
 }
 
 export enum PaymentMethodV2 {
-  ONLINE = "online",
   UPI = "upi",
   CARD = "card",
   WALLET = "wallet",
   COD = "cod",
+  NETBANKING = "netbanking",
+}
+
+/**
+ * Raw payment method string returned by Razorpay in the payment object.
+ * Stored in v2_payments.razorpayMethod for direct querying.
+ */
+export enum RazorpayPaymentMethod {
+  CARD = "card",
+  NETBANKING = "netbanking",
+  WALLET = "wallet",
+  UPI = "upi",
+  EMI = "emi",
+  COD = "cod",
+  UNKNOWN = "unknown",
+}
+
+/**
+ * Raw payment status returned by Razorpay in the payment object.
+ * Stored in v2_payments.razorpayStatus alongside our internal PaymentStatusV2.
+ * Enables direct reconciliation without parsing razorpayResponse JSONB.
+ *
+ * Mapping:
+ *   created     → payment order created, no attempt yet
+ *   authorized  → authorized but not yet captured (auto-capture disabled)
+ *   captured    → money captured → maps to our status=SUCCESS
+ *   refunded    → fully refunded by Razorpay
+ *   failed      → payment attempt failed → maps to our status=FAILED
+ */
+export enum RazorpayPaymentStatus {
+  CREATED = "created",
+  AUTHORIZED = "authorized",
+  CAPTURED = "captured",
+  REFUNDED = "refunded",
+  FAILED = "failed",
 }
 
 /** Three-step cancellation refund tracker. Six-step return/exchange tracker. */

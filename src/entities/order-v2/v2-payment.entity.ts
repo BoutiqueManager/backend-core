@@ -12,6 +12,8 @@ import {
   PaymentTypeV2,
   PaymentMethodV2,
   PaymentStatusV2,
+  RazorpayPaymentMethod,
+  RazorpayPaymentStatus,
 } from "../../enums/order-v2.enum";
 import { UpiApp, CardBrand } from "../../enums/payment.enum";
 import { V2CheckoutSession } from "./v2-checkout-session.entity";
@@ -87,6 +89,14 @@ export class V2Payment {
   razorpayPaymentId: string;
 
   /**
+   * Raw Razorpay payment lifecycle status for direct reconciliation.
+   * Independent from our internal `status` (PaymentStatusV2).
+   * captured → our status=SUCCESS, failed → our status=FAILED.
+   */
+  @Column({ type: "enum", enum: RazorpayPaymentStatus, nullable: true })
+  razorpayStatus: RazorpayPaymentStatus;
+
+  /**
    * HMAC-SHA256 signature from Razorpay for payment verification.
    * Validated before marking payment as successful.
    */
@@ -97,8 +107,9 @@ export class V2Payment {
   @Column({ type: "jsonb", nullable: true })
   razorpayResponse: Record<string, any>;
 
-  @Column({ type: "varchar", length: 20, nullable: true })
-  razorpayMethod: string;
+  /** Razorpay payment method: card, netbanking, wallet, upi, emi, cod */
+  @Column({ type: "enum", enum: RazorpayPaymentMethod, nullable: true })
+  razorpayMethod: RazorpayPaymentMethod;
 
   /** Wallet provider name e.g. "mobikwik", "paytm" — populated when method = "wallet" */
   @Column({ type: "varchar", length: 50, nullable: true })
