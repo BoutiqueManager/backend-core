@@ -154,6 +154,8 @@ export interface OrderItemDetailV2 {
     finalPricePerItem: number;
     totalFinalPrice: number;
     campaignCode: string | null;
+    advancePaid: number;
+    remainingAmount: number;
   };
   status: string;
   estimatedDeliveryDate: string | null;

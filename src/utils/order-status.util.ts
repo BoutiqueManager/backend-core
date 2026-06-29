@@ -228,3 +228,56 @@ export function computeOrderStatusFromItemStatuses(
   // ── Rule 8: Mixed / unresolvable — caller preserves current status ────────
   return null;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI Display Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Determines whether to show the estimated delivery date for an item.
+ * Shows for all active statuses until the item is delivered, cancelled, returned, or exchanged.
+ */
+export function shouldShowEstimatedDelivery(
+  status: OrderItemStatusV2,
+): boolean {
+  const terminalStatuses = new Set([
+    OrderItemStatusV2.DELIVERED,
+    OrderItemStatusV2.CANCELLED,
+    OrderItemStatusV2.RETURNED,
+    OrderItemStatusV2.EXCHANGED,
+    OrderItemStatusV2.RETURN_REJECTED,
+    OrderItemStatusV2.EXCHANGE_REJECTED,
+  ]);
+  return !terminalStatuses.has(status);
+}
+
+/**
+ * Returns true if the status is part of the refund flow.
+ * Includes refund statuses and the terminal return status that triggers refund.
+ */
+export function isRefundFlowStatus(status: OrderItemStatusV2): boolean {
+  const refundFlowStatuses = new Set([
+    OrderItemStatusV2.REFUND_INITIATED,
+    OrderItemStatusV2.REFUND_CREDITED,
+    OrderItemStatusV2.REFUND_FAILED,
+    OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER,
+    OrderItemStatusV2.RETURNED,
+  ]);
+  return refundFlowStatuses.has(status);
+}
+
+/**
+ * Determines whether to show the refund/cancellation stepper UI.
+ * Shows for:
+ * - CANCELLED status (non-COD orders only)
+ * - Any refund flow status
+ */
+export function shouldShowRefundStepper(
+  status: OrderItemStatusV2,
+  isCodOrder: boolean,
+): boolean {
+  if (status === OrderItemStatusV2.CANCELLED && !isCodOrder) {
+    return true;
+  }
+  return isRefundFlowStatus(status);
+}
