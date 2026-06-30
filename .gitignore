@@ -2,7 +2,6 @@ node_modules/
 
 dist/
 
-/dist
 
 config/local.json
 pgdata/
