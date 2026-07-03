@@ -136,10 +136,7 @@ export class V2OrderItem {
   @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
   couponDiscountPerItem: number;
 
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
-  taxPerItem: number;
-
-  /** offerPrice − couponDiscountPerItem + taxPerItem */
+  /** offerPrice − couponDiscountPerItem */
   @Column({ type: "decimal", precision: 10, scale: 2 })
   finalPricePerItem: number;
 
@@ -160,12 +157,29 @@ export class V2OrderItem {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalCouponDiscount: number;
 
-  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
-  totalTax: number;
-
   /** finalPricePerItem × quantity — the canonical amount for refund calculation */
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalFinalPrice: number;
+
+  /** Full packaging charge for this item (₹450/item × qty) — for seller invoice */
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  fullPackagingChargeForItem: number;
+
+  /** Packaging charge collected from customer (₹150/item × qty — 1/3 of full) */
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  packagingChargeForItem: number;
+
+  /** Full Shiprocket shipping charge for this item (prorated from boutique total) — for seller invoice */
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  fullShippingChargeForItem: number;
+
+  /** Shipping charge collected from customer for this item (1/3 of full) */
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  shippingChargeForItem: number;
+
+  /** GST (18%) charged to customer on this item (on finalPrice + packagingCustomer + shippingCustomer) */
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  gstChargeForItem: number;
 
   // ─── Per-Item Partial / Advance Payment ──────────────────────────────────
   /**

@@ -73,12 +73,25 @@ export class V2Order {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalCouponDiscount: number;
 
-  /** Shipping charges based on selected delivery address */
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  /** Full Shiprocket shipping charge for this order (for seller invoice) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  fullShippingCharges: number;
+
+  /** Shipping charges collected from customer (1/3 of fullShippingCharges) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   shippingCharges: number;
 
-  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
-  totalTax: number;
+  /** Full packaging charge for this order (₹450/item × qty — for seller invoice) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  fullPackagingCharges: number;
+
+  /** Packaging charges collected from customer (₹150/item × qty — 1/3 of full) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  packagingCharges: number;
+
+  /** GST (18%) charged to customer (on subtotalOfferPrice − coupon + packagingCharges + shippingCharges) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  gstCharges: number;
 
   /** Actual amount payable for this boutique order */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })

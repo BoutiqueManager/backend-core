@@ -71,11 +71,23 @@ export interface V2CheckoutItem {
   /** Prorated share of coupon discount for this item */
   couponDiscountPerItem?: number;
 
-  /** Tax per unit (typically 0) */
-  taxPerItem?: number;
-
-  /** Final price: offerPrice - couponDiscountPerItem + taxPerItem */
+  /** Final price: offerPrice - couponDiscountPerItem */
   finalPricePerItem: number;
+
+  /** Full packaging charge for this item (₹450/item × qty) — for seller invoice */
+  fullPackagingChargeForItem?: number;
+
+  /** Packaging charge collected from customer (₹150/item × qty) */
+  packagingChargeForItem?: number;
+
+  /** Full shipping charge prorated to this item — for seller invoice */
+  fullShippingChargeForItem?: number;
+
+  /** Shipping charge collected from customer for this item */
+  shippingChargeForItem?: number;
+
+  /** GST (18%) on this item charged to customer */
+  gstChargeForItem?: number;
 
   /** Quantity ordered */
   quantity: number;
@@ -149,8 +161,20 @@ export interface V2CheckoutBoutique {
   /** Optional boutique logo URL */
   boutiqueLogoUrl?: string;
 
-  /** Shipping charges for this boutique's order */
+  /** Full Shiprocket shipping charge for this boutique order (for seller invoice) */
+  fullShippingCharges: number;
+
+  /** Shipping charges collected from customer (1/3 of fullShippingCharges) */
   shippingCharges: number;
+
+  /** Full packaging charge for this boutique order (₹450/item × qty — for seller invoice) */
+  fullPackagingCharges: number;
+
+  /** Packaging charges collected from customer (₹150/item × qty) */
+  packagingCharges: number;
+
+  /** GST (18%) charged to customer for this boutique order */
+  gstCharges: number;
 
   /** Sum of (mrp × qty) for all items */
   subtotalMrp: number;
@@ -164,12 +188,9 @@ export interface V2CheckoutBoutique {
   /** Total coupon discount for this boutique order */
   totalCouponDiscount: number;
 
-  /** Tax total (typically 0) */
-  totalTax?: number;
-
   /**
    * Actual amount payable for this boutique:
-   * subtotalOfferPrice - totalCouponDiscount + shippingCharges + totalTax
+   * subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
    */
   grandTotal: number;
 
@@ -227,15 +248,24 @@ export interface CreateCheckoutPayload {
   /** Sum of all boutiques' totalCouponDiscount */
   totalCouponDiscount: number;
 
-  /** Sum of all boutiques' shippingCharges */
+  /** Sum of all boutiques' fullShippingCharges (for seller invoice) */
+  totalFullShippingCharges: number;
+
+  /** Sum of all boutiques' shippingCharges (customer-paid) */
   totalShippingCharges: number;
 
-  /** Sum of all boutiques' totalTax (optional) */
-  totalTax?: number;
+  /** Sum of all boutiques' fullPackagingCharges (for seller invoice) */
+  totalFullPackagingCharges: number;
+
+  /** Sum of all boutiques' packagingCharges (customer-paid) */
+  totalPackagingCharges: number;
+
+  /** Sum of all boutiques' gstCharges */
+  totalGstCharges: number;
 
   /**
    * Final amount charged across all boutiques:
-   * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalTax
+   * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
    */
   grandTotal: number;
 }
