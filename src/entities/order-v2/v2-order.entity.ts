@@ -150,6 +150,10 @@ export class V2Order {
   @Column({ type: "varchar", nullable: true })
   trackingUrl: string;
 
+  /** Shiprocket courier company ID selected at checkout for this order */
+  @Column({ type: "int", nullable: true })
+  selectedCourierCompanyId: number;
+
   // ─── Status ───────────────────────────────────────────────────────────────
   @Column({ type: "enum", enum: OrderStatusV2, default: OrderStatusV2.NEW })
   status: OrderStatusV2;

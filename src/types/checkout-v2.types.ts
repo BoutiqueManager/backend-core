@@ -200,6 +200,9 @@ export interface V2CheckoutBoutique {
   /** Percentage of grandTotal paid as advance: (advancePaid / grandTotal) * 100 */
   advancePercentage: number;
 
+  /** Shiprocket courier company ID selected for this boutique order (for AWB assignment) */
+  selectedCourierCompanyId?: number;
+
   /** Array of checkout items for this boutique */
   items: V2CheckoutItem[];
 
