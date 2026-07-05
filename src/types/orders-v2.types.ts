@@ -49,6 +49,8 @@ export interface OrderV2ItemSummary {
     shippingChargeForItem: number;
     packagingChargeForitem: number;
     gstChargeForItem: number;
+    grandTotalCost: number;
+    totalAmountPaid: number;
   };
   status: string;
   estimatedDeliveryDate?: string | null;
@@ -99,9 +101,10 @@ export interface OrderV2Summary {
     subtotalOfferPrice: number;
     totalCouponDiscount: number;
     shippingCharges: number;
-    totalTax: number;
+    packingCharges: number;
     totalAmountPaid: number;
     grandTotalCost: number;
+    gstCharges: number;
   };
   partialPayment?: {
     advancePercentage: number;
@@ -161,7 +164,10 @@ export interface OrderItemDetailV2 {
     advancePaid: number;
     remainingAmount: number;
     shippingChargeForItem: number;
-    packagingChargeForItem: number;
+    packagingChargeForitem: number;
+    gstChargeForItem: number;
+    grandTotalCost: number;
+    totalAmountPaid: number;
   };
   status: string;
   estimatedDeliveryDate: string | null;
@@ -238,9 +244,10 @@ export interface OrderDetailV2 {
     subtotalOfferPrice: number;
     totalCouponDiscount: number;
     shippingCharges: number;
-    totalTax: number;
+    packingCharges: number;
     totalAmountPaid: number;
     grandTotalCost: number;
+    gstCharges: number;
   };
   partialPayment?: {
     advancePercentage: number;
