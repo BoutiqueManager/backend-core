@@ -184,20 +184,23 @@ export class V2OrderItem {
 
   // ─── Per-Item Partial / Advance Payment ──────────────────────────────────
 
-  // Percentage
+  // Percentage of the item's grandTotalCost paid at checkout (advancePaid / grandTotalCost).
   @Column({ type: "decimal", precision: 5, scale: 2, default: 0 })
   advancedPercentagePaid: number;
 
   /**
-   *Amount paid on this item by the customer,
-   Incase of ready to ship item - should be equals to amount chagred as final price
+   * Amount paid on this item by the customer at checkout.
+   * Includes the product-price advance plus the item's prorated share of
+   * shipping, packaging and GST (fixed charges are always collected in full).
+   * For ready_to_ship / full payment this equals totalAmountPaid.
    */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   advancePaid: number;
 
   /**
-   * Balance still owed for this item after delivery.
-   * totalFinalPrice − advancePaid. 0 for full-payment and COD items.
+   * Product-price balance still owed for this item after delivery.
+   * totalFinalPrice − (advancePaid − fixedChargesShare).
+   * 0 for full-payment and COD items.
    */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   remainingAmount: number;
@@ -208,15 +211,15 @@ export class V2OrderItem {
   // ─── Total Amount Calculations ───────────────────────────────────────────────
 
   /**
-   * Total Amount paid on item by customer including totalFinalPrice + GST + Shipping + Packaging
-   * Formula: totalFinalPrice + gstChargeForItem + shippingChargeForItem + packagingChargeForItem
+   * Total amount paid on item by customer at checkout (the advance paid now).
+   * For full payment this equals grandTotalCost; for partial payment it is less.
    */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalAmountPaid: number;
 
   /**
    * Grand total cost on each item - final price per item + GST + Shipping + Packaging
-   * Same as totalAmountPaid for RTS orders. Used for seller invoice calculations.
+   * Used for seller invoice calculations.
    * Formula: totalFinalPrice + gstChargeForItem + shippingChargeForItem + packagingChargeForItem
    */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
@@ -334,14 +337,4 @@ export class V2OrderItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  getRefundableAmount(): number {
-    if (this.status === OrderItemStatusV2.DELIVERED) {
-      const nonRefundable =
-        (this.shippingChargeForItem || 0) + (this.packagingChargeForItem || 0);
-      return this.totalAmountPaid - nonRefundable;
-    } else {
-      return this.totalAmountPaid;
-    }
-  }
 }

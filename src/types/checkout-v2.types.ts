@@ -93,15 +93,17 @@ export interface V2CheckoutItem {
   quantity: number;
 
   /**
-   * Advance amount charged for this item at checkout.
-   * - Ready-to-ship + full payment: equals totalFinalPrice
-   * - Made-to-measure + partial payment: prorated advance share
+   * Amount the customer pays for this item at checkout.
+   * Includes the product-price advance plus the item's prorated share of
+   * shipping, packaging and GST (fixed charges are always collected in full).
+   * - Ready-to-ship + full payment: equals totalFinalPrice + fixed charges
+   * - Made-to-measure + partial payment: prorated product-price advance + fixed charges
    * - COD: 0
    */
   advancePaid: number;
 
   /**
-   * Balance still owed after delivery: totalFinalPrice - advancePaid.
+   * Product-price balance still owed after delivery: totalFinalPrice - (advancePaid - fixedChargesShare).
    * 0 for ready_to_ship with full payment.
    */
   remainingAmount: number;
@@ -110,7 +112,7 @@ export interface V2CheckoutItem {
   estimatedDeliveryDate?: string;
 
   /**
-   * Percentage of totalFinalPrice paid as advance.
+   * Percentage of the item's grandTotalCost paid at checkout.
    * - Ready-to-ship: 100
    * - Made-to-measure partial: 20-100 (user selected)
    * - COD: 0
