@@ -270,11 +270,16 @@ export interface CreateCheckoutPayload {
   totalGstCharges: number;
 
   /**
-   * Final amount charged across all boutiques:
+   * Total amount paid by customer across all boutiques:
    * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
-   * (This is used for payment amount calculation, but orders will use totalAmountPaid)
    */
-  grandTotal: number;
+  totalAmountPaid: number;
+
+  /**
+   * Grand total cost across all boutiques (same as totalAmountPaid for RTS orders)
+   * Used for seller invoice calculations.
+   */
+  grandTotalCost: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

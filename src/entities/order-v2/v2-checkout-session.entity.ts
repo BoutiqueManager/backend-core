@@ -69,7 +69,20 @@ export class V2CheckoutSession {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalGstCharges: number;
 
-  /** The actual grand total charged to customer across all boutique orders */
+  // ─── Total Amount Calculations ───────────────────────────────────────────────
+
+  /**
+   * Total amount paid by customer across all boutique orders:
+   * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
+   */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  totalAmountPaid: number;
+
+  /**
+   * Grand total cost across all boutique orders (same as totalAmountPaid for RTS orders)
+   * Used for seller invoice calculations.
+   * Formula: totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
+   */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   grandTotalCost: number;
 

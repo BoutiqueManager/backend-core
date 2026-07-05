@@ -205,13 +205,20 @@ export class V2OrderItem {
   @Column({ type: "text", nullable: true })
   customerNote: string;
 
-  // --- Total Amounton each order
+  // ─── Total Amount Calculations ───────────────────────────────────────────────
 
-  /* Total Amount paid on item by customer incuding totalFinalPrice + GST +Shipping+ Packaging */
+  /**
+   * Total Amount paid on item by customer including totalFinalPrice + GST + Shipping + Packaging
+   * Formula: totalFinalPrice + gstChargeForItem + shippingChargeForItem + packagingChargeForItem
+   */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalAmountPaid: number;
 
-  /* Grand total cost on Each item  - final Price per item +  GST + Shipping + Packaging - would be same as TotalAmount paid on RTS orders. */
+  /**
+   * Grand total cost on each item - final price per item + GST + Shipping + Packaging
+   * Same as totalAmountPaid for RTS orders. Used for seller invoice calculations.
+   * Formula: totalFinalPrice + gstChargeForItem + shippingChargeForItem + packagingChargeForItem
+   */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   grandTotalCost: number;
 

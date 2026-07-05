@@ -117,11 +117,21 @@ export class V2Order {
   @Column({ type: "timestamp", nullable: true })
   remainingPaidAt: Date;
 
-  // total Amount paid by customer on order (sum of all items' totalAmountPaid excluding remaining balance)
+  // ─── Total Amount Calculations ───────────────────────────────────────────────
+
+  /**
+   * Total amount paid by customer for this boutique order:
+   * subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
+   * Same as grandTotalCost for RTS orders.
+   */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalAmountPaid: number;
 
-  // total Amount paid by customer on order (sum of all items' totalAmountPaid)
+  /**
+   * Grand total cost for this boutique (same as totalAmountPaid for RTS orders)
+   * Used for seller invoice calculations.
+   * Formula: subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
+   */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   grandTotalCost: number;
 
