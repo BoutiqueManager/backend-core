@@ -160,6 +160,8 @@ export class V2CheckoutSession {
   @Column({ type: "varchar", length: 64, nullable: true })
   idempotencyKey: string;
 
+  selectedCourierCompanyId: number;
+
   // ─── Relations ────────────────────────────────────────────────────────────
   @OneToMany(() => V2Order, (order) => order.checkoutSession)
   orders: V2Order[];
