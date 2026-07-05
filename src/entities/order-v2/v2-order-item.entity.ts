@@ -136,7 +136,7 @@ export class V2OrderItem {
   @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
   couponDiscountPerItem: number;
 
-  /** offerPrice − couponDiscountPerItem */
+  /** offerPrice − couponDiscountPerItem  exclusive of Any Shipping, packing or gst */
   @Column({ type: "decimal", precision: 10, scale: 2 })
   finalPricePerItem: number;
 
@@ -151,13 +151,14 @@ export class V2OrderItem {
   // total discount is the discount per item(MRP  -offered price) * quantity
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalDiscount: number;
+
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalOfferPrice: number;
 
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   totalCouponDiscount: number;
 
-  /** finalPricePerItem × quantity — the canonical amount for refund calculation */
+  /** finalPricePerItem × quantity — the canonical amount for refund calculation excluding gst, shipping and packaging*/
   @Column({ type: "decimal", precision: 12, scale: 2 })
   totalFinalPrice: number;
 
@@ -182,17 +183,17 @@ export class V2OrderItem {
   gstChargeForItem: number;
 
   // ─── Per-Item Partial / Advance Payment ──────────────────────────────────
+
+  // Percentage
+  @Column({ type: "decimal", precision: 5, scale: 2, default: 0 })
+  advancedPercentagePaid: number;
+
   /**
-   * For made_to_measure items in a partial-payment order: the prorated advance
-   * amount charged at checkout for this item.
-   * For ready_to_ship or COD items this equals totalFinalPrice or 0 respectively.
-   * Snapshot from frontend — never changes after order creation.
+   *Amount paid on this item by the customer,
+   Incase of ready to ship item - should be equals to amount chagred as final price
    */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   advancePaid: number;
-
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 0 })
-  advancedPercentagePaid: number;
 
   /**
    * Balance still owed for this item after delivery.
@@ -204,7 +205,18 @@ export class V2OrderItem {
   @Column({ type: "text", nullable: true })
   customerNote: string;
 
+  // --- Total Amounton each order
+
+  /* Total Amount paid on item by customer incuding totalFinalPrice + GST +Shipping+ Packaging */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  totalAmountPaid: number;
+
+  /* Grand total cost on Each item  - final Price per item +  GST + Shipping + Packaging - would be same as TotalAmount paid on RTS orders. */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  grandTotalCost: number;
+
   // ─── Item Status & Dates ──────────────────────────────────────────────────
+
   @Column({
     type: "enum",
     enum: OrderItemStatusV2,
@@ -315,4 +327,14 @@ export class V2OrderItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  getRefundableAmount(): number {
+    if (this.status === OrderItemStatusV2.DELIVERED) {
+      const nonRefundable =
+        (this.shippingChargeForItem || 0) + (this.packagingChargeForItem || 0);
+      return this.totalAmountPaid - nonRefundable;
+    } else {
+      return this.totalAmountPaid;
+    }
+  }
 }

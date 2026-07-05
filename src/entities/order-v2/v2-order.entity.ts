@@ -61,13 +61,13 @@ export class V2Order {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   subtotalMrp: number;
 
-  /** Total discount = subtotalMrp − subtotalOfferPrice */
-  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
-  totalDiscount: number;
-
   /** Sum of (offerPrice × qty) for all items */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   subtotalOfferPrice: number;
+
+  /** Total discount = subtotalMrp − subtotalOfferPrice */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  totalDiscount: number;
 
   /** Sum of all coupon discounts applied to this order */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
@@ -93,10 +93,6 @@ export class V2Order {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   gstCharges: number;
 
-  /** Actual amount payable for this boutique order */
-  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
-  grandTotal: number;
-
   // ─── Partial / Advance Payment ────────────────────────────────────────────
   /** True if at least one item in this order is made_to_measure */
   @Column({ type: "boolean", default: false })
@@ -113,13 +109,21 @@ export class V2Order {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   advancePaid: number;
 
-  /** Amount still owed after delivery (grandTotal − advancePaid) */
+  /** Amount still owed after delivery (totalAmountPaid − advancePaid) */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   remainingAmount: number;
 
   /** Timestamp when customer paid the remaining balance after delivery */
   @Column({ type: "timestamp", nullable: true })
   remainingPaidAt: Date;
+
+  // total Amount paid by customer on order (sum of all items' totalAmountPaid)
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  totalAmountPaid: number;
+
+  /** Grand total cost on order (sum of all items' grandTotalCost) */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  grandTotalCost: number;
 
   // ─── Payment ──────────────────────────────────────────────────────────────
   @Column({ type: "enum", enum: PaymentMethodV2 })

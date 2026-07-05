@@ -46,6 +46,9 @@ export interface OrderV2ItemSummary {
     totalFinalPrice: number;
     advancePaid: number;
     remainingAmount: number;
+    shippingChargeForItem: number;
+    packagingChargeForitem: number;
+    gstChargeForItem: number;
   };
   status: string;
   estimatedDeliveryDate?: string | null;
@@ -97,7 +100,8 @@ export interface OrderV2Summary {
     totalCouponDiscount: number;
     shippingCharges: number;
     totalTax: number;
-    grandTotal: number;
+    totalAmountPaid: number;
+    grandTotalCost: number;
   };
   partialPayment?: {
     advancePercentage: number;
@@ -156,6 +160,8 @@ export interface OrderItemDetailV2 {
     campaignCode: string | null;
     advancePaid: number;
     remainingAmount: number;
+    shippingChargeForItem: number;
+    packagingChargeForItem: number;
   };
   status: string;
   estimatedDeliveryDate: string | null;
@@ -233,7 +239,8 @@ export interface OrderDetailV2 {
     totalCouponDiscount: number;
     shippingCharges: number;
     totalTax: number;
-    grandTotal: number;
+    totalAmountPaid: number;
+    grandTotalCost: number;
   };
   partialPayment?: {
     advancePercentage: number;

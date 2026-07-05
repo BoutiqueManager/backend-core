@@ -71,7 +71,7 @@ export class V2CheckoutSession {
 
   /** The actual grand total charged to customer across all boutique orders */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
-  grandTotal: number;
+  grandTotalCost: number;
 
   // ─── Partial Payment ──────────────────────────────────────────────────────
   /** True if any order in this session has made_to_measure items */

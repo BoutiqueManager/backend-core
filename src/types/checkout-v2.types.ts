@@ -189,15 +189,18 @@ export interface V2CheckoutBoutique {
   totalCouponDiscount: number;
 
   /**
-   * Actual amount payable for this boutique:
+   * Total amount paid by customer for this boutique:
    * subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
    */
-  grandTotal: number;
+  totalAmountPaid: number;
+
+  /** Grand total cost for this boutique (same as totalAmountPaid for RTS orders) */
+  grandTotalCost: number;
 
   /** Amount paid in advance (sum of all items' advancePaid) */
   advancePaid: number;
 
-  /** Percentage of grandTotal paid as advance: (advancePaid / grandTotal) * 100 */
+  /** Percentage of totalAmountPaid paid as advance: (advancePaid / grandTotalCost) * 100 */
   advancePercentage: number;
 
   /** Shiprocket courier company ID selected for this boutique order (for AWB assignment) */
@@ -269,6 +272,7 @@ export interface CreateCheckoutPayload {
   /**
    * Final amount charged across all boutiques:
    * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
+   * (This is used for payment amount calculation, but orders will use totalAmountPaid)
    */
   grandTotal: number;
 }

@@ -59,27 +59,35 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2Order.prototype, "totalDiscount", void 0);
+], V2Order.prototype, "subtotalOfferPrice", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2Order.prototype, "subtotalOfferPrice", void 0);
+], V2Order.prototype, "totalDiscount", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
 ], V2Order.prototype, "totalCouponDiscount", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2Order.prototype, "shippingCharges", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
-    __metadata("design:type", Number)
-], V2Order.prototype, "totalTax", void 0);
+], V2Order.prototype, "fullShippingCharges", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2Order.prototype, "grandTotal", void 0);
+], V2Order.prototype, "shippingCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "fullPackagingCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "packagingCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "gstCharges", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "boolean", default: false }),
     __metadata("design:type", Boolean)
@@ -100,6 +108,14 @@ __decorate([
     (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
     __metadata("design:type", Date)
 ], V2Order.prototype, "remainingPaidAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "totalAmountPaid", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "grandTotalCost", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "enum", enum: order_v2_enum_1.PaymentMethodV2 }),
     __metadata("design:type", String)
@@ -132,6 +148,10 @@ __decorate([
     (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], V2Order.prototype, "trackingUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "int", nullable: true }),
+    __metadata("design:type", Number)
+], V2Order.prototype, "selectedCourierCompanyId", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "enum", enum: order_v2_enum_1.OrderStatusV2, default: order_v2_enum_1.OrderStatusV2.NEW }),
     __metadata("design:type", String)
