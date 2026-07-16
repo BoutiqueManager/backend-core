@@ -67,6 +67,10 @@ export class V2ReverseShipment {
   // Reverse leg is SHIPPING ONLY — packaging is never added to the reverse
   // calculation. GST @18% applies on the reverse shipping cost.
 
+  /** Shiprocket courier company ID used for the reverse leg (same as forward). */
+  @Column({ type: "int", nullable: true })
+  courierCompanyId: number | null;
+
   /** Reverse shipping cost (ex-GST). Packaging excluded by design. */
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   shippingCost: number;
