@@ -6,7 +6,10 @@ import {
   UpdateDateColumn,
   Index,
 } from "typeorm";
-import { ReverseShipmentStatus } from "../../enums/order-v2.enum";
+import {
+  ReverseShipmentCostBearer,
+  ReverseShipmentStatus,
+} from "../../enums/order-v2.enum";
 
 /**
  * Shared reverse logistics entity for both return and exchange pickup operations.
@@ -41,6 +44,13 @@ export class V2ReverseShipment {
   @Column({ type: "uuid", nullable: true })
   exchangeOrderId: string;
 
+  /**
+   * Set for RTO legs created when a customer refuses delivery at the door
+   * (RTS Delivery Refused scenario) — no return/exchange order exists there.
+   */
+  @Column({ type: "uuid", nullable: true })
+  orderItemId: string | null;
+
   @Column({ type: "uuid" })
   customerId: string;
 
@@ -52,6 +62,34 @@ export class V2ReverseShipment {
   /** Immutable address snapshot — locked at creation, never changes */
   @Column({ type: "jsonb" })
   pickupAddress: Record<string, any>;
+
+  // ─── Reverse Shipping Charges (per Refund & Settlement PRD) ────────────────
+  // Reverse leg is SHIPPING ONLY — packaging is never added to the reverse
+  // calculation. GST @18% applies on the reverse shipping cost.
+
+  /** Reverse shipping cost (ex-GST). Packaging excluded by design. */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  shippingCost: number;
+
+  /** GST @18% on shippingCost. */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  gstOnShippingCost: number;
+
+  /** shippingCost + gstOnShippingCost. */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  totalCost: number;
+
+  /**
+   * Who bears the reverse-shipment cost:
+   *   - LABELD  (default) → returns/exchanges: absorbed, never deducted from refund
+   *   - CUSTOMER          → RTS delivery refused: deducted from the customer refund
+   */
+  @Column({
+    type: "enum",
+    enum: ReverseShipmentCostBearer,
+    default: ReverseShipmentCostBearer.LABELD,
+  })
+  costBearer: ReverseShipmentCostBearer;
 
   // ─── Logistics ────────────────────────────────────────────────────────────
   @Column({ type: "varchar", length: 100, nullable: true })
