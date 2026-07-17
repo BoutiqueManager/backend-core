@@ -50,17 +50,33 @@ __decorate([
     __metadata("design:type", Number)
 ], V2CheckoutSession.prototype, "totalCouponDiscount", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
 ], V2CheckoutSession.prototype, "totalShippingCharges", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2CheckoutSession.prototype, "totalTax", void 0);
+], V2CheckoutSession.prototype, "totalFullShippingCharges", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2CheckoutSession.prototype, "grandTotal", void 0);
+], V2CheckoutSession.prototype, "totalPackagingCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2CheckoutSession.prototype, "totalFullPackagingCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2CheckoutSession.prototype, "totalGstCharges", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2CheckoutSession.prototype, "totalAmountPaid", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2CheckoutSession.prototype, "grandTotalCost", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "boolean", default: false }),
     __metadata("design:type", Boolean)

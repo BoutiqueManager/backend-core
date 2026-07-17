@@ -1,4 +1,4 @@
-import { ReverseShipmentStatus } from "../../enums/order-v2.enum";
+import { ReverseShipmentCostBearer, ReverseShipmentStatus } from "../../enums/order-v2.enum";
 /**
  * Shared reverse logistics entity for both return and exchange pickup operations.
  *
@@ -17,10 +17,29 @@ export declare class V2ReverseShipment {
     reverseShipmentId: string;
     returnOrderId: string;
     exchangeOrderId: string;
+    /**
+     * Set for RTO legs created when a customer refuses delivery at the door
+     * (RTS Delivery Refused scenario) — no return/exchange order exists there.
+     */
+    orderItemId: string | null;
     customerId: string;
     pickupAddressId: string | null;
     /** Immutable address snapshot — locked at creation, never changes */
     pickupAddress: Record<string, any>;
+    /** Shiprocket courier company ID used for the reverse leg (same as forward). */
+    courierCompanyId: number | null;
+    /** Reverse shipping cost (ex-GST). Packaging excluded by design. */
+    shippingCost: number;
+    /** GST @18% on shippingCost. */
+    gstOnShippingCost: number;
+    /** shippingCost + gstOnShippingCost. */
+    totalCost: number;
+    /**
+     * Who bears the reverse-shipment cost:
+     *   - LABELD  (default) → returns/exchanges: absorbed, never deducted from refund
+     *   - CUSTOMER          → RTS delivery refused: deducted from the customer refund
+     */
+    costBearer: ReverseShipmentCostBearer;
     logisticsProvider: string;
     trackingNumber: string;
     trackingUrl: string;

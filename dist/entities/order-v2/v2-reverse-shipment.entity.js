@@ -45,6 +45,10 @@ __decorate([
     __metadata("design:type", String)
 ], V2ReverseShipment.prototype, "exchangeOrderId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "uuid", nullable: true }),
+    __metadata("design:type", String)
+], V2ReverseShipment.prototype, "orderItemId", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "uuid" }),
     __metadata("design:type", String)
 ], V2ReverseShipment.prototype, "customerId", void 0);
@@ -56,6 +60,30 @@ __decorate([
     (0, typeorm_1.Column)({ type: "jsonb" }),
     __metadata("design:type", Object)
 ], V2ReverseShipment.prototype, "pickupAddress", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "int", nullable: true }),
+    __metadata("design:type", Number)
+], V2ReverseShipment.prototype, "courierCompanyId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2ReverseShipment.prototype, "shippingCost", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2ReverseShipment.prototype, "gstOnShippingCost", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2ReverseShipment.prototype, "totalCost", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: order_v2_enum_1.ReverseShipmentCostBearer,
+        default: order_v2_enum_1.ReverseShipmentCostBearer.LABELD,
+    }),
+    __metadata("design:type", String)
+], V2ReverseShipment.prototype, "costBearer", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "varchar", length: 100, nullable: true }),
     __metadata("design:type", String)

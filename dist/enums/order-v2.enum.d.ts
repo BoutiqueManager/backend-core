@@ -73,7 +73,10 @@ export declare enum OrderPaymentStatusV2 {
 }
 export declare enum PaymentMethodV2 {
     COD = "cod",
-    online = "online"
+    ONLINE = "online",
+    CARD = "card",
+    UPI = "upi",
+    WALLET = "wallet"
 }
 /**
  * Raw payment method string returned by Razorpay in the payment object.
@@ -168,6 +171,16 @@ export declare enum ExchangeOrderItemStatus {
     RECEIVED = "RECEIVED",
     EXCHANGED = "EXCHANGED",
     REJECTED = "REJECTED"
+}
+/**
+ * Who bears the reverse-shipment cost — per Refund & Settlement PRD:
+ *   - RETURN           → LABELD absorbs the reverse leg (never charged to customer)
+ *   - RTS DELIVERY REFUSED → CUSTOMER pays the reverse leg (deducted from refund)
+ * Reverse leg is SHIPPING ONLY — packaging is never added to the reverse calculation.
+ */
+export declare enum ReverseShipmentCostBearer {
+    CUSTOMER = "customer",
+    LABELD = "labeld"
 }
 export declare enum ReverseShipmentStatus {
     PENDING = "PENDING",

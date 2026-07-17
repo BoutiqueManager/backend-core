@@ -129,10 +129,6 @@ __decorate([
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "couponDiscountPerItem", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
-    __metadata("design:type", Number)
-], V2OrderItem.prototype, "taxPerItem", void 0);
-__decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2 }),
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "finalPricePerItem", void 0);
@@ -157,21 +153,37 @@ __decorate([
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "totalCouponDiscount", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
-    __metadata("design:type", Number)
-], V2OrderItem.prototype, "totalTax", void 0);
-__decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2 }),
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "totalFinalPrice", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
     __metadata("design:type", Number)
-], V2OrderItem.prototype, "advancePaid", void 0);
+], V2OrderItem.prototype, "fullPackagingChargeForItem", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "packagingChargeForItem", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "fullShippingChargeForItem", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "shippingChargeForItem", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "gstChargeForItem", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 5, scale: 2, default: 0 }),
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "advancedPercentagePaid", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "advancePaid", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
     __metadata("design:type", Number)
@@ -180,6 +192,14 @@ __decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], V2OrderItem.prototype, "customerNote", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "totalAmountPaid", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "decimal", precision: 12, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "grandTotalCost", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: "enum",
