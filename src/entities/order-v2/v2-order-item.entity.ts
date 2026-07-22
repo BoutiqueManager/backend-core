@@ -337,4 +337,15 @@ export class V2OrderItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  //shiprocket tracking details
+  @Column({ type: "bigint", nullable: true })
+ shiprocketOrderId: number;
+
+  @Column({ type: "bigint", nullable: true })
+  shiprocketShipmentId: number;
+
+  /** Ship-burst progress: CREATED → AWB_ASSIGNED → PICKUP_SCHEDULED, or FAILED */
+  @Column({ type: "varchar", length: 32, nullable: true })
+  shipmentBurstStatus: string;
 }
