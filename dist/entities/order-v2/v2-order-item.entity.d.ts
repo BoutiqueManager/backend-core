@@ -41,6 +41,12 @@ export declare class V2OrderItem {
     measurementSnapshot: Record<string, any>;
     /** True if made_to_measure with custom measurements submitted */
     isCustomized: boolean;
+    /**
+     * Evidence that customer confirmed these measurements at order time.
+     * Required for MTM disputes (PRD Section 7).
+     */
+    isMeasurementConsentGiven: boolean;
+    measurementConsentGivenAt: Date;
     /** Marked price / MRP — shown as strikethrough in UI */
     mrp: number;
     /** mrp − offerPrice */
@@ -144,4 +150,8 @@ export declare class V2OrderItem {
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
+    shiprocketOrderId: number;
+    shiprocketShipmentId: number;
+    /** Ship-burst progress: CREATED → AWB_ASSIGNED → PICKUP_SCHEDULED, or FAILED */
+    shipmentBurstStatus: string;
 }

@@ -56,6 +56,12 @@ export interface V2CheckoutItem {
   /** Whether this item has customization */
   isCustomized?: boolean;
 
+  /** Whether customer confirmed measurements (required for MTM) */
+  isMeasurementConsentGiven?: boolean;
+
+  /** Timestamp of measurement consent (ISO string) */
+  measurementConsentGivenAt?: string;
+
   /** Marked/MRP price (strikethrough in UI) */
   mrp: number;
 

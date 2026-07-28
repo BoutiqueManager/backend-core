@@ -86,6 +86,12 @@ const getEventDisplayInfo = (eventType, customDescription) => {
             icon: "❌",
             color: "#F44336",
         },
+        [order_v2_enum_1.OrderEventTypeV2.ITEM_REFUSED]: {
+            title: "Delivery Refused",
+            description: "Customer refused to accept delivery",
+            icon: "✋",
+            color: "#F44336",
+        },
         [order_v2_enum_1.OrderEventTypeV2.RETURN_INITIATED]: {
             title: "Return Initiated",
             description: "Return request has been initiated",

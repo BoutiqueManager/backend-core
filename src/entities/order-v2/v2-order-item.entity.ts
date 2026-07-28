@@ -115,6 +115,16 @@ export class V2OrderItem {
   @Column({ type: "boolean", default: false })
   isCustomized: boolean;
 
+  /**
+   * Evidence that customer confirmed these measurements at order time.
+   * Required for MTM disputes (PRD Section 7).
+   */
+  @Column({ type: "boolean", default: false })
+  isMeasurementConsentGiven: boolean;
+
+  @Column({ type: "timestamp", nullable: true })
+  measurementConsentGivenAt: Date;
+
   // ─── Per-Unit Pricing ─────────────────────────────────────────────────────
   /** Marked price / MRP — shown as strikethrough in UI */
   @Column({ type: "decimal", precision: 10, scale: 2 })

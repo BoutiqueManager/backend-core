@@ -28,6 +28,8 @@ class StatusTransitionService {
             [order_v2_enum_1.OrderItemStatusV2.CANCELLED]: reason
                 ? `Item cancelled by ${actorType}. Reason: ${reason}`
                 : `Item cancelled by ${actorType}`,
+            [order_v2_enum_1.OrderItemStatusV2.RTO_INITIATED]: "Delivery refused by customer",
+            [order_v2_enum_1.OrderItemStatusV2.RTO_DELIVERED]: "Item returned to designer",
             [order_v2_enum_1.OrderItemStatusV2.RETURN_INITIATED]: "Return request has been initiated",
             [order_v2_enum_1.OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: "Return pickup has been scheduled",
             [order_v2_enum_1.OrderItemStatusV2.RETURN_PICKED_UP]: "Item has been picked up for return",
@@ -77,6 +79,8 @@ StatusTransitionService.statusToEventMap = {
     [order_v2_enum_1.OrderItemStatusV2.OUT_FOR_DELIVERY]: order_v2_enum_1.OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
     [order_v2_enum_1.OrderItemStatusV2.DELIVERED]: order_v2_enum_1.OrderEventTypeV2.ITEM_DELIVERED,
     [order_v2_enum_1.OrderItemStatusV2.CANCELLED]: order_v2_enum_1.OrderEventTypeV2.ITEM_CANCELLED,
+    [order_v2_enum_1.OrderItemStatusV2.RTO_INITIATED]: order_v2_enum_1.OrderEventTypeV2.ITEM_REFUSED,
+    [order_v2_enum_1.OrderItemStatusV2.RTO_DELIVERED]: order_v2_enum_1.OrderEventTypeV2.ITEM_REFUSED,
     [order_v2_enum_1.OrderItemStatusV2.RETURN_INITIATED]: order_v2_enum_1.OrderEventTypeV2.RETURN_INITIATED,
     [order_v2_enum_1.OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: order_v2_enum_1.OrderEventTypeV2.RETURN_INITIATED,
     [order_v2_enum_1.OrderItemStatusV2.RETURN_PICKED_UP]: order_v2_enum_1.OrderEventTypeV2.RETURN_PICKED_UP,
