@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "npm run build"
   },
   "exports": {
@@ -47,6 +48,7 @@
     "typeorm": "^0.3.28 || ^1.0.0"
   },
   "devDependencies": {
+    "prettier": "^3.4.2",
     "typeorm": "^1.0.0"
   },
   "dependencies": {

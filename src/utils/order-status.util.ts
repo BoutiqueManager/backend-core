@@ -13,7 +13,12 @@ import { OrderItemStatusV2, OrderStatusV2 } from "../enums/order-v2.enum";
  *  3. All non-cancelled items DELIVERED (full)    → DELIVERED
  *  4. ALL active items RETURNED/RECEIVED_BY_SELLER/REFUNDED → RETURNED (TERMINAL)
  *  5. ALL active items EXCHANGED                  → EXCHANGED
+ *  5.4. ALL active items in terminal non-return states
+ *      (DELIVERED, EXCHANGED, RETURN_REJECTED, EXCHANGE_REJECTED)
+ *      without any returns/refunds                → DELIVERED
  *  5.5. Mixed terminal states with ANY RETURNED/REFUND → RETURNED (highest priority)
+ *  5.6. ALL active items SHIPPED                   → SHIPPED
+ *  5.7. ALL active items OUT_FOR_DELIVERY          → OUT_FOR_DELIVERY
  *  6. Any item in an active transition state
  *     (IN_PROGRESS / SCHEDULED_PICKUP / PICKUP_SCHEDULED /
  *      OUT_FOR_DELIVERY / SHIPPED /
@@ -161,8 +166,11 @@ export function computeOrderStatusFromItemStatuses(
   // ── Derive "active" (non-cancelled) items ─────────────────────────────────
   const activeCount = total - cancelledCount;
 
-  // ── Rule 2 & 3: ALL active items DELIVERED ────────────────────────────────
-  if (deliveredCount === activeCount) {
+  // ── Rule 2 & 3: ALL active items DELIVERED (or effectively delivered) ────────
+  // RETURN_REJECTED and EXCHANGE_REJECTED mean the item reverts to delivered
+  const effectiveDeliveredCount =
+    deliveredCount + returnRejectedCount + exchangeRejectedCount;
+  if (effectiveDeliveredCount === activeCount) {
     return cancelledCount > 0
       ? OrderStatusV2.PARTIALLY_CANCELLED
       : OrderStatusV2.DELIVERED;
@@ -196,6 +204,26 @@ export function computeOrderStatusFromItemStatuses(
     // RETURNED is the most advanced/highest priority status
     return OrderStatusV2.RETURNED;
   }
+
+  // ── Rule 5.4: ALL active items in terminal non-return states → DELIVERED ──
+  // Covers mix of DELIVERED, EXCHANGED, RETURN_REJECTED, EXCHANGE_REJECTED
+  // (all are terminal, no returns/refunds in flight)
+  // If all are EXCHANGED, Rule 5 already returned EXCHANGED
+  // If any returns/refunds, Rule 4/5.5 already returned RETURNED
+  if (
+    effectiveDeliveredCount + exchangedCount === activeCount &&
+    terminalReturnCount === 0 &&
+    activeCount > 0
+  ) {
+    return OrderStatusV2.DELIVERED;
+  }
+
+  // ── Rule 5.6: ALL active items SHIPPED → SHIPPED ──────────────────────────
+  if (shippedCount === activeCount) return OrderStatusV2.SHIPPED;
+
+  // ── Rule 5.7: ALL active items OUT_FOR_DELIVERY → OUT_FOR_DELIVERY ────────
+  if (outForDeliveryCount === activeCount)
+    return OrderStatusV2.OUT_FOR_DELIVERY;
 
   // ── Rule 6: Any item in an ACTIVE transition state → IN_PROGRESS ──────────
   // This covers the forward fulfilment flow and all mid-flight return/exchange
