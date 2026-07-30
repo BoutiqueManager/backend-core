@@ -47,28 +47,38 @@ export interface V2CheckoutItem {
     campaignCode?: string;
     /** Prorated share of coupon discount for this item */
     couponDiscountPerItem?: number;
-    /** Tax per unit (typically 0) */
-    taxPerItem?: number;
-    /** Final price: offerPrice - couponDiscountPerItem + taxPerItem */
+    /** Final price: offerPrice - couponDiscountPerItem */
     finalPricePerItem: number;
+    /** Full packaging charge for this item (₹450/item × qty) — for seller invoice */
+    fullPackagingChargeForItem?: number;
+    /** Packaging charge collected from customer (₹150/item × qty) */
+    packagingChargeForItem?: number;
+    /** Full shipping charge prorated to this item — for seller invoice */
+    fullShippingChargeForItem?: number;
+    /** Shipping charge collected from customer for this item */
+    shippingChargeForItem?: number;
+    /** GST (18%) on this item charged to customer */
+    gstChargeForItem?: number;
     /** Quantity ordered */
     quantity: number;
     /**
-     * Advance amount charged for this item at checkout.
-     * - Ready-to-ship + full payment: equals totalFinalPrice
-     * - Made-to-measure + partial payment: prorated advance share
+     * Amount the customer pays for this item at checkout.
+     * Includes the product-price advance plus the item's prorated share of
+     * shipping, packaging and GST (fixed charges are always collected in full).
+     * - Ready-to-ship + full payment: equals totalFinalPrice + fixed charges
+     * - Made-to-measure + partial payment: prorated product-price advance + fixed charges
      * - COD: 0
      */
     advancePaid: number;
     /**
-     * Balance still owed after delivery: totalFinalPrice - advancePaid.
+     * Product-price balance still owed after delivery: totalFinalPrice - (advancePaid - fixedChargesShare).
      * 0 for ready_to_ship with full payment.
      */
     remainingAmount: number;
     /** Per-item estimated delivery date (ISO format) */
     estimatedDeliveryDate?: string;
     /**
-     * Percentage of totalFinalPrice paid as advance.
+     * Percentage of the item's grandTotalCost paid at checkout.
      * - Ready-to-ship: 100
      * - Made-to-measure partial: 20-100 (user selected)
      * - COD: 0
@@ -102,8 +112,16 @@ export interface V2CheckoutBoutique {
     boutiqueName: string;
     /** Optional boutique logo URL */
     boutiqueLogoUrl?: string;
-    /** Shipping charges for this boutique's order */
+    /** Full Shiprocket shipping charge for this boutique order (for seller invoice) */
+    fullShippingCharges: number;
+    /** Shipping charges collected from customer (1/3 of fullShippingCharges) */
     shippingCharges: number;
+    /** Full packaging charge for this boutique order (₹450/item × qty — for seller invoice) */
+    fullPackagingCharges: number;
+    /** Packaging charges collected from customer (₹150/item × qty) */
+    packagingCharges: number;
+    /** GST (18%) charged to customer for this boutique order */
+    gstCharges: number;
     /** Sum of (mrp × qty) for all items */
     subtotalMrp: number;
     /** Sum of (discountAmount × qty) - subtotalMrp - subtotalOfferPrice */
@@ -112,17 +130,19 @@ export interface V2CheckoutBoutique {
     subtotalOfferPrice: number;
     /** Total coupon discount for this boutique order */
     totalCouponDiscount: number;
-    /** Tax total (typically 0) */
-    totalTax?: number;
     /**
-     * Actual amount payable for this boutique:
-     * subtotalOfferPrice - totalCouponDiscount + shippingCharges + totalTax
+     * Total amount paid by customer for this boutique:
+     * subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
      */
-    grandTotal: number;
+    totalAmountPaid: number;
+    /** Grand total cost for this boutique (same as totalAmountPaid for RTS orders) */
+    grandTotalCost: number;
     /** Amount paid in advance (sum of all items' advancePaid) */
     advancePaid: number;
-    /** Percentage of grandTotal paid as advance: (advancePaid / grandTotal) * 100 */
+    /** Percentage of totalAmountPaid paid as advance: (advancePaid / grandTotalCost) * 100 */
     advancePercentage: number;
+    /** Shiprocket courier company ID selected for this boutique order (for AWB assignment) */
+    selectedCourierCompanyId?: number;
     /** Array of checkout items for this boutique */
     items: V2CheckoutItem[];
     /** Array of coupons applied to this boutique order */
@@ -154,15 +174,26 @@ export interface CreateCheckoutPayload {
     totalOfferPrice: number;
     /** Sum of all boutiques' totalCouponDiscount */
     totalCouponDiscount: number;
-    /** Sum of all boutiques' shippingCharges */
+    /** Sum of all boutiques' fullShippingCharges (for seller invoice) */
+    totalFullShippingCharges: number;
+    /** Sum of all boutiques' shippingCharges (customer-paid) */
     totalShippingCharges: number;
-    /** Sum of all boutiques' totalTax (optional) */
-    totalTax?: number;
+    /** Sum of all boutiques' fullPackagingCharges (for seller invoice) */
+    totalFullPackagingCharges: number;
+    /** Sum of all boutiques' packagingCharges (customer-paid) */
+    totalPackagingCharges: number;
+    /** Sum of all boutiques' gstCharges */
+    totalGstCharges: number;
     /**
-     * Final amount charged across all boutiques:
-     * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalTax
+     * Total amount paid by customer across all boutiques:
+     * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
      */
-    grandTotal: number;
+    totalAmountPaid: number;
+    /**
+     * Grand total cost across all boutiques (same as totalAmountPaid for RTS orders)
+     * Used for seller invoice calculations.
+     */
+    grandTotalCost: number;
 }
 /**
  * Order created in the checkout response

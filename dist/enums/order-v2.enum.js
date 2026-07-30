@@ -4,7 +4,7 @@
 // Source of truth for all v2 order-related enumerations.
 // ─────────────────────────────────────────────────────────────────────────────
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = exports.getOrderItemStatusDisplayName = exports.getOrderStatusDisplayName = exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = exports.ORDER_STATUS_DISPLAY_NAMES = exports.isItemStatusFinal = exports.isOrderStatusFinal = exports.getNextPossibleItemStatuses = exports.getNextPossibleOrderStatuses = exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.RazorpayPaymentStatus = exports.RazorpayPaymentMethod = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
+exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = exports.getOrderItemStatusDisplayName = exports.getOrderStatusDisplayName = exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = exports.ORDER_STATUS_DISPLAY_NAMES = exports.isItemStatusFinal = exports.isOrderStatusFinal = exports.getNextPossibleItemStatuses = exports.getNextPossibleOrderStatuses = exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ReverseShipmentCostBearer = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.RazorpayPaymentStatus = exports.RazorpayPaymentMethod = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
 /** Top-level order status, computed from item statuses per PRD global rules. */
 var OrderStatusV2;
 (function (OrderStatusV2) {
@@ -90,7 +90,10 @@ var OrderPaymentStatusV2;
 var PaymentMethodV2;
 (function (PaymentMethodV2) {
     PaymentMethodV2["COD"] = "cod";
-    PaymentMethodV2["online"] = "online";
+    PaymentMethodV2["ONLINE"] = "online";
+    PaymentMethodV2["CARD"] = "card";
+    PaymentMethodV2["UPI"] = "upi";
+    PaymentMethodV2["WALLET"] = "wallet";
 })(PaymentMethodV2 || (exports.PaymentMethodV2 = PaymentMethodV2 = {}));
 /**
  * Raw payment method string returned by Razorpay in the payment object.
@@ -196,6 +199,17 @@ var ExchangeOrderItemStatus;
     ExchangeOrderItemStatus["EXCHANGED"] = "EXCHANGED";
     ExchangeOrderItemStatus["REJECTED"] = "REJECTED";
 })(ExchangeOrderItemStatus || (exports.ExchangeOrderItemStatus = ExchangeOrderItemStatus = {}));
+/**
+ * Who bears the reverse-shipment cost — per Refund & Settlement PRD:
+ *   - RETURN           → LABELD absorbs the reverse leg (never charged to customer)
+ *   - RTS DELIVERY REFUSED → CUSTOMER pays the reverse leg (deducted from refund)
+ * Reverse leg is SHIPPING ONLY — packaging is never added to the reverse calculation.
+ */
+var ReverseShipmentCostBearer;
+(function (ReverseShipmentCostBearer) {
+    ReverseShipmentCostBearer["CUSTOMER"] = "customer";
+    ReverseShipmentCostBearer["LABELD"] = "labeld";
+})(ReverseShipmentCostBearer || (exports.ReverseShipmentCostBearer = ReverseShipmentCostBearer = {}));
 var ReverseShipmentStatus;
 (function (ReverseShipmentStatus) {
     ReverseShipmentStatus["PENDING"] = "PENDING";

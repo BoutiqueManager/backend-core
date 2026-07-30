@@ -13,10 +13,27 @@ export declare class V2CheckoutSession {
     totalDiscount: number;
     totalOfferPrice: number;
     totalCouponDiscount: number;
+    /** Shipping charges collected from customer (1/3 of totalFullShippingCharges) */
     totalShippingCharges: number;
-    totalTax: number;
-    /** The actual grand total charged to customer across all boutique orders */
-    grandTotal: number;
+    /** Full Shiprocket shipping charges across all orders (for seller invoice) */
+    totalFullShippingCharges: number;
+    /** Packaging charges collected from customer (₹150/item × totalQty) */
+    totalPackagingCharges: number;
+    /** Full packaging charges across all orders (₹450/item × totalQty — for seller invoice) */
+    totalFullPackagingCharges: number;
+    /** Total GST (18%) charged to customer across all orders */
+    totalGstCharges: number;
+    /**
+     * Total amount paid by customer across all boutique orders:
+     * totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
+     */
+    totalAmountPaid: number;
+    /**
+     * Grand total cost across all boutique orders (same as totalAmountPaid for RTS orders)
+     * Used for seller invoice calculations.
+     * Formula: totalOfferPrice - totalCouponDiscount + totalShippingCharges + totalPackagingCharges + totalGstCharges
+     */
+    grandTotalCost: number;
     /** True if any order in this session has made_to_measure items */
     hasPartialPayment: boolean;
     /** Total advance paid across all boutique orders (sum of v2_orders.advancePaid) */
@@ -45,6 +62,7 @@ export declare class V2CheckoutSession {
     retryCount: number;
     /** Idempotency key to prevent duplicate Razorpay order creation */
     idempotencyKey: string;
+    selectedCourierCompanyId: number;
     orders: V2Order[];
     createdAt: Date;
     updatedAt: Date;

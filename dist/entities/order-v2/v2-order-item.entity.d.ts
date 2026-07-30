@@ -51,31 +51,51 @@ export declare class V2OrderItem {
     campaignCode: string;
     /** Prorated share of coupon discount assigned to this item */
     couponDiscountPerItem: number;
-    taxPerItem: number;
-    /** offerPrice − couponDiscountPerItem + taxPerItem */
+    /** offerPrice − couponDiscountPerItem  exclusive of Any Shipping, packing or gst */
     finalPricePerItem: number;
     quantity: number;
     totalMrp: number;
     totalDiscount: number;
     totalOfferPrice: number;
     totalCouponDiscount: number;
-    totalTax: number;
-    /** finalPricePerItem × quantity — the canonical amount for refund calculation */
+    /** finalPricePerItem × quantity — the canonical amount for refund calculation excluding gst, shipping and packaging*/
     totalFinalPrice: number;
-    /**
-     * For made_to_measure items in a partial-payment order: the prorated advance
-     * amount charged at checkout for this item.
-     * For ready_to_ship or COD items this equals totalFinalPrice or 0 respectively.
-     * Snapshot from frontend — never changes after order creation.
-     */
-    advancePaid: number;
+    /** Full packaging charge for this item (₹450/item × qty) — for seller invoice */
+    fullPackagingChargeForItem: number;
+    /** Packaging charge collected from customer (₹150/item × qty — 1/3 of full) */
+    packagingChargeForItem: number;
+    /** Full Shiprocket shipping charge for this item (prorated from boutique total) — for seller invoice */
+    fullShippingChargeForItem: number;
+    /** Shipping charge collected from customer for this item (1/3 of full) */
+    shippingChargeForItem: number;
+    /** GST (18%) charged to customer on this item (on finalPrice + packagingCustomer + shippingCustomer) */
+    gstChargeForItem: number;
     advancedPercentagePaid: number;
     /**
-     * Balance still owed for this item after delivery.
-     * totalFinalPrice − advancePaid. 0 for full-payment and COD items.
+     * Amount paid on this item by the customer at checkout.
+     * Includes the product-price advance plus the item's prorated share of
+     * shipping, packaging and GST (fixed charges are always collected in full).
+     * For ready_to_ship / full payment this equals totalAmountPaid.
+     */
+    advancePaid: number;
+    /**
+     * Product-price balance still owed for this item after delivery.
+     * totalFinalPrice − (advancePaid − fixedChargesShare).
+     * 0 for full-payment and COD items.
      */
     remainingAmount: number;
     customerNote: string;
+    /**
+     * Total amount paid on item by customer at checkout (the advance paid now).
+     * For full payment this equals grandTotalCost; for partial payment it is less.
+     */
+    totalAmountPaid: number;
+    /**
+     * Grand total cost on each item - final price per item + GST + Shipping + Packaging
+     * Used for seller invoice calculations.
+     * Formula: totalFinalPrice + gstChargeForItem + shippingChargeForItem + packagingChargeForItem
+     */
+    grandTotalCost: number;
     status: OrderItemStatusV2;
     confirmedAt: Date;
     shippedAt: Date;

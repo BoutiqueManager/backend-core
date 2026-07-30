@@ -16,17 +16,22 @@ export declare class V2Order {
     boutiqueLogoUrl: string;
     /** Sum of (mrp × qty) for all items in this boutique order */
     subtotalMrp: number;
-    /** Total discount = subtotalMrp − subtotalOfferPrice */
-    totalDiscount: number;
     /** Sum of (offerPrice × qty) for all items */
     subtotalOfferPrice: number;
+    /** Total discount = subtotalMrp − subtotalOfferPrice */
+    totalDiscount: number;
     /** Sum of all coupon discounts applied to this order */
     totalCouponDiscount: number;
-    /** Shipping charges based on selected delivery address */
+    /** Full Shiprocket shipping charge for this order (for seller invoice) */
+    fullShippingCharges: number;
+    /** Shipping charges collected from customer (1/3 of fullShippingCharges) */
     shippingCharges: number;
-    totalTax: number;
-    /** Actual amount payable for this boutique order */
-    grandTotal: number;
+    /** Full packaging charge for this order (₹450/item × qty — for seller invoice) */
+    fullPackagingCharges: number;
+    /** Packaging charges collected from customer (₹150/item × qty — 1/3 of full) */
+    packagingCharges: number;
+    /** GST (18%) charged to customer (on subtotalOfferPrice − coupon + packagingCharges + shippingCharges) */
+    gstCharges: number;
     /** True if at least one item in this order is made_to_measure */
     hasPartialPayment: boolean;
     /**
@@ -36,10 +41,22 @@ export declare class V2Order {
     advancePercentage: number;
     /** Amount already paid (advance or full) */
     advancePaid: number;
-    /** Amount still owed after delivery (grandTotal − advancePaid) */
+    /** Amount still owed after delivery (totalAmountPaid − advancePaid) */
     remainingAmount: number;
     /** Timestamp when customer paid the remaining balance after delivery */
     remainingPaidAt: Date;
+    /**
+     * Total amount paid by customer for this boutique order:
+     * subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
+     * Same as grandTotalCost for RTS orders.
+     */
+    totalAmountPaid: number;
+    /**
+     * Grand total cost for this boutique (same as totalAmountPaid for RTS orders)
+     * Used for seller invoice calculations.
+     * Formula: subtotalOfferPrice - totalCouponDiscount + shippingCharges + packagingCharges + gstCharges
+     */
+    grandTotalCost: number;
     paymentMethod: PaymentMethodV2;
     paymentStatus: OrderPaymentStatusV2;
     shippingAddress: Record<string, any>;
@@ -48,6 +65,8 @@ export declare class V2Order {
     trackingNumber: string;
     trackingCarrier: string;
     trackingUrl: string;
+    /** Shiprocket courier company ID selected at checkout for this order */
+    selectedCourierCompanyId: number;
     status: OrderStatusV2;
     orderDate: Date;
     confirmedAt: Date;
