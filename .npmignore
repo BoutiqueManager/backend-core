@@ -1,0 +1,7 @@
+src/
+*.ts
+!dist/
+tsconfig.json
+.git/
+.github/
+node_modules/
