@@ -142,3 +142,82 @@ function resolveStatus(
     ? (raw as OrderItemStatusV2)
     : OrderItemStatusV2.NEW;
 }
+
+// ── Ionicons variant (boutique-native-app / customer-ui) ─────────────────────
+
+export interface OrderItemStatusUIIonicons {
+  label: string;
+  color: string;
+  icon: string;
+}
+
+export const ORDER_ITEM_STATUS_COLORS_IONICONS: Record<OrderItemStatusV2, string> = {
+  [OrderItemStatusV2.NEW]:                         "#323F90",
+  [OrderItemStatusV2.IN_PROGRESS]:                 "#AA8200",
+  [OrderItemStatusV2.SCHEDULED_PICKUP]:            "#AA8200",
+  [OrderItemStatusV2.PICKUP_SCHEDULED]:            "#AA8200",
+  [OrderItemStatusV2.SHIPPED]:                     "#1565C0",
+  [OrderItemStatusV2.OUT_FOR_DELIVERY]:            "#0277BD",
+  [OrderItemStatusV2.DELIVERED]:                   "#26704A",
+  [OrderItemStatusV2.CANCELLED]:                   "#B71C1C",
+  [OrderItemStatusV2.RETURN_INITIATED]:            "#E65100",
+  [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:     "#E65100",
+  [OrderItemStatusV2.RETURN_PICKED_UP]:            "#E65100",
+  [OrderItemStatusV2.RETURN_IN_TRANSIT]:           "#E65100",
+  [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]:   "#E65100",
+  [OrderItemStatusV2.RETURNED]:                    "#898989",
+  [OrderItemStatusV2.RETURN_REJECTED]:             "#B71C1C",
+  [OrderItemStatusV2.EXCHANGE_INITIATED]:          "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_PICKUP_SCHEDULED]:   "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_PICKED_UP]:          "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_IN_TRANSIT]:         "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_RECEIVED_BY_SELLER]: "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_ORDER_PLACED]:       "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_SHIPPED]:            "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGE_DELIVERED]:          "#6A1B9A",
+  [OrderItemStatusV2.EXCHANGED]:                   "#898989",
+  [OrderItemStatusV2.EXCHANGE_REJECTED]:           "#B71C1C",
+  [OrderItemStatusV2.REFUND_INITIATED]:            "#E65100",
+  [OrderItemStatusV2.REFUND_CREDITED]:             "#26704A",
+  [OrderItemStatusV2.REFUND_FAILED]:               "#B71C1C",
+};
+
+export const ORDER_ITEM_STATUS_ICONS_IONICONS: Record<OrderItemStatusV2, string> = {
+  [OrderItemStatusV2.NEW]:                         "radio-button-on",
+  [OrderItemStatusV2.IN_PROGRESS]:                 "construct",
+  [OrderItemStatusV2.SCHEDULED_PICKUP]:            "time",
+  [OrderItemStatusV2.PICKUP_SCHEDULED]:            "calendar",
+  [OrderItemStatusV2.SHIPPED]:                     "cube",
+  [OrderItemStatusV2.OUT_FOR_DELIVERY]:            "bicycle",
+  [OrderItemStatusV2.DELIVERED]:                   "checkmark-done-circle",
+  [OrderItemStatusV2.CANCELLED]:                   "close-circle",
+  [OrderItemStatusV2.RETURN_INITIATED]:            "return-down-back",
+  [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:     "calendar",
+  [OrderItemStatusV2.RETURN_PICKED_UP]:            "bag",
+  [OrderItemStatusV2.RETURN_IN_TRANSIT]:           "car",
+  [OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER]:   "storefront",
+  [OrderItemStatusV2.RETURNED]:                    "checkmark-circle",
+  [OrderItemStatusV2.RETURN_REJECTED]:             "close-circle",
+  [OrderItemStatusV2.EXCHANGE_INITIATED]:          "swap-horizontal",
+  [OrderItemStatusV2.EXCHANGE_PICKUP_SCHEDULED]:   "calendar",
+  [OrderItemStatusV2.EXCHANGE_PICKED_UP]:          "bag",
+  [OrderItemStatusV2.EXCHANGE_IN_TRANSIT]:         "car",
+  [OrderItemStatusV2.EXCHANGE_RECEIVED_BY_SELLER]: "storefront",
+  [OrderItemStatusV2.EXCHANGE_ORDER_PLACED]:       "receipt",
+  [OrderItemStatusV2.EXCHANGE_SHIPPED]:            "cube",
+  [OrderItemStatusV2.EXCHANGE_DELIVERED]:          "gift",
+  [OrderItemStatusV2.EXCHANGED]:                   "checkmark-circle",
+  [OrderItemStatusV2.EXCHANGE_REJECTED]:           "close-circle",
+  [OrderItemStatusV2.REFUND_INITIATED]:            "cash",
+  [OrderItemStatusV2.REFUND_CREDITED]:             "checkmark-circle",
+  [OrderItemStatusV2.REFUND_FAILED]:               "close-circle",
+};
+
+export function getOrderItemStatusUIIonicons(status: string): OrderItemStatusUIIonicons {
+  const s = status as OrderItemStatusV2;
+  return {
+    label: ORDER_ITEM_STATUS_DISPLAY_NAMES[s] ?? status,
+    color: ORDER_ITEM_STATUS_COLORS_IONICONS[s] ?? "#898989",
+    icon:  ORDER_ITEM_STATUS_ICONS_IONICONS[s]  ?? "help-circle",
+  };
+}
