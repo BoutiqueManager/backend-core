@@ -17,6 +17,7 @@ var OrderStatusV2;
     OrderStatusV2["PARTIALLY_CANCELLED"] = "PARTIALLY_CANCELLED";
     OrderStatusV2["RETURNED"] = "RETURNED";
     OrderStatusV2["EXCHANGED"] = "EXCHANGED";
+    OrderStatusV2["RTO"] = "RTO";
 })(OrderStatusV2 || (exports.OrderStatusV2 = OrderStatusV2 = {}));
 /** Per-item status — tracks full lifecycle including return/exchange. */
 var OrderItemStatusV2;
@@ -29,6 +30,9 @@ var OrderItemStatusV2;
     OrderItemStatusV2["OUT_FOR_DELIVERY"] = "OUT_FOR_DELIVERY";
     OrderItemStatusV2["DELIVERED"] = "DELIVERED";
     OrderItemStatusV2["CANCELLED"] = "CANCELLED";
+    // ── RTO (Return to Origin) / Refusal ────────────────────────────────────
+    OrderItemStatusV2["RTO_INITIATED"] = "RTO_INITIATED";
+    OrderItemStatusV2["RTO_DELIVERED"] = "RTO_DELIVERED";
     // ── Return flow ──────────────────────────────────────────────────────────
     OrderItemStatusV2["RETURN_INITIATED"] = "RETURN_INITIATED";
     OrderItemStatusV2["RETURN_PICKUP_SCHEDULED"] = "RETURN_PICKUP_SCHEDULED";
@@ -254,6 +258,7 @@ var OrderEventTypeV2;
     OrderEventTypeV2["ITEM_OUT_FOR_DELIVERY"] = "ITEM_OUT_FOR_DELIVERY";
     OrderEventTypeV2["ITEM_DELIVERED"] = "ITEM_DELIVERED";
     OrderEventTypeV2["ITEM_CANCELLED"] = "ITEM_CANCELLED";
+    OrderEventTypeV2["ITEM_REFUSED"] = "ITEM_REFUSED";
     // Return/Exchange flow
     OrderEventTypeV2["RETURN_INITIATED"] = "RETURN_INITIATED";
     OrderEventTypeV2["RETURN_PICKED_UP"] = "RETURN_PICKED_UP";
@@ -343,7 +348,10 @@ const getNextPossibleOrderStatuses = (currentStatus) => {
             OrderStatusV2.OUT_FOR_DELIVERY, // Usually auto-set by logistics
             OrderStatusV2.DELIVERED, // Seller can mark delivered
         ],
-        [OrderStatusV2.OUT_FOR_DELIVERY]: [OrderStatusV2.DELIVERED],
+        [OrderStatusV2.OUT_FOR_DELIVERY]: [
+            OrderStatusV2.DELIVERED,
+            OrderStatusV2.RTO,
+        ],
         [OrderStatusV2.DELIVERED]: [
             OrderStatusV2.RETURNED, // Customer initiates return after delivery
         ],
@@ -354,6 +362,7 @@ const getNextPossibleOrderStatuses = (currentStatus) => {
         ],
         [OrderStatusV2.RETURNED]: [],
         [OrderStatusV2.EXCHANGED]: [],
+        [OrderStatusV2.RTO]: [],
     };
     return statusFlow[currentStatus] || [];
 };
@@ -376,7 +385,12 @@ const getNextPossibleItemStatuses = (currentStatus) => {
         [OrderItemStatusV2.SCHEDULED_PICKUP]: [OrderItemStatusV2.PICKUP_SCHEDULED],
         [OrderItemStatusV2.PICKUP_SCHEDULED]: [OrderItemStatusV2.SHIPPED],
         [OrderItemStatusV2.SHIPPED]: [OrderItemStatusV2.OUT_FOR_DELIVERY],
-        [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
+        [OrderItemStatusV2.OUT_FOR_DELIVERY]: [
+            OrderItemStatusV2.DELIVERED,
+            OrderItemStatusV2.RTO_INITIATED,
+        ],
+        [OrderItemStatusV2.RTO_INITIATED]: [OrderItemStatusV2.RTO_DELIVERED],
+        [OrderItemStatusV2.RTO_DELIVERED]: [],
         // Delivered once - can either be returned or marked as completed
         [OrderItemStatusV2.DELIVERED]: [
             OrderItemStatusV2.RETURN_INITIATED,
@@ -445,7 +459,8 @@ exports.getNextPossibleItemStatuses = getNextPossibleItemStatuses;
 const isOrderStatusFinal = (status) => {
     return (status === OrderStatusV2.DELIVERED ||
         status === OrderStatusV2.CANCELLED ||
-        status === OrderStatusV2.RETURNED);
+        status === OrderStatusV2.RETURNED ||
+        status === OrderStatusV2.RTO);
 };
 exports.isOrderStatusFinal = isOrderStatusFinal;
 /**
@@ -459,6 +474,7 @@ const isItemStatusFinal = (status) => {
         OrderItemStatusV2.EXCHANGED,
         OrderItemStatusV2.RETURN_REJECTED,
         OrderItemStatusV2.EXCHANGE_REJECTED,
+        OrderItemStatusV2.RTO_DELIVERED,
     ];
     return finalStatuses.includes(status);
 };
@@ -479,6 +495,7 @@ exports.ORDER_STATUS_DISPLAY_NAMES = {
     [OrderStatusV2.PARTIALLY_CANCELLED]: "Partially Cancelled",
     [OrderStatusV2.RETURNED]: "Returned",
     [OrderStatusV2.EXCHANGED]: "Exchanged",
+    [OrderStatusV2.RTO]: "Refused / RTO",
 };
 /**
  * Item-level status display names for UI
@@ -490,6 +507,9 @@ exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
     [OrderItemStatusV2.DELIVERED]: "Delivered",
     [OrderItemStatusV2.CANCELLED]: "Cancelled",
+    // RTO flow
+    [OrderItemStatusV2.RTO_INITIATED]: "Delivery Refused",
+    [OrderItemStatusV2.RTO_DELIVERED]: "Returned to Origin",
     // Return flow
     [OrderItemStatusV2.RETURN_INITIATED]: "Return Initiated",
     [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: "Return Pickup Scheduled",

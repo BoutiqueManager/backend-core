@@ -23,6 +23,8 @@ export class StatusTransitionService {
         OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
       [OrderItemStatusV2.DELIVERED]: OrderEventTypeV2.ITEM_DELIVERED,
       [OrderItemStatusV2.CANCELLED]: OrderEventTypeV2.ITEM_CANCELLED,
+      [OrderItemStatusV2.RTO_INITIATED]: OrderEventTypeV2.ITEM_REFUSED,
+      [OrderItemStatusV2.RTO_DELIVERED]: OrderEventTypeV2.ITEM_REFUSED,
       [OrderItemStatusV2.RETURN_INITIATED]: OrderEventTypeV2.RETURN_INITIATED,
       [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:
         OrderEventTypeV2.RETURN_INITIATED,
@@ -83,6 +85,8 @@ export class StatusTransitionService {
       [OrderItemStatusV2.CANCELLED]: reason
         ? `Item cancelled by ${actorType}. Reason: ${reason}`
         : `Item cancelled by ${actorType}`,
+      [OrderItemStatusV2.RTO_INITIATED]: "Delivery refused by customer",
+      [OrderItemStatusV2.RTO_DELIVERED]: "Item returned to designer",
       [OrderItemStatusV2.RETURN_INITIATED]: "Return request has been initiated",
       [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:
         "Return pickup has been scheduled",

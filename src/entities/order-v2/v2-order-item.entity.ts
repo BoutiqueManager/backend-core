@@ -115,6 +115,16 @@ export class V2OrderItem {
   @Column({ type: "boolean", default: false })
   isCustomized: boolean;
 
+  /**
+   * Evidence that customer confirmed these measurements at order time.
+   * Required for MTM disputes (PRD Section 7).
+   */
+  @Column({ type: "boolean", default: false })
+  isMeasurementConsentGiven: boolean;
+
+  @Column({ type: "timestamp", nullable: true })
+  measurementConsentGivenAt: Date;
+
   // ─── Per-Unit Pricing ─────────────────────────────────────────────────────
   /** Marked price / MRP — shown as strikethrough in UI */
   @Column({ type: "decimal", precision: 10, scale: 2 })
@@ -337,4 +347,15 @@ export class V2OrderItem {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  //shiprocket tracking details
+  @Column({ type: "bigint", nullable: true })
+ shiprocketOrderId: number;
+
+  @Column({ type: "bigint", nullable: true })
+  shiprocketShipmentId: number;
+
+  /** Ship-burst progress: CREATED → AWB_ASSIGNED → PICKUP_SCHEDULED, or FAILED */
+  @Column({ type: "varchar", length: 32, nullable: true })
+  shipmentBurstStatus: string;
 }

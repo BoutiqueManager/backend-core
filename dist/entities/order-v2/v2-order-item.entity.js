@@ -109,6 +109,14 @@ __decorate([
     __metadata("design:type", Boolean)
 ], V2OrderItem.prototype, "isCustomized", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "boolean", default: false }),
+    __metadata("design:type", Boolean)
+], V2OrderItem.prototype, "isMeasurementConsentGiven", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
+    __metadata("design:type", Date)
+], V2OrderItem.prototype, "measurementConsentGivenAt", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2 }),
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "mrp", void 0);
@@ -312,6 +320,18 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], V2OrderItem.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "shiprocketOrderId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "shiprocketShipmentId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", length: 32, nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "shipmentBurstStatus", void 0);
 exports.V2OrderItem = V2OrderItem = __decorate([
     (0, typeorm_1.Entity)("v2_order_items"),
     (0, typeorm_1.Index)(["orderId"]),
