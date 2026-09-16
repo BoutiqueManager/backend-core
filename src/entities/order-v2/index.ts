@@ -12,6 +12,7 @@ export { V2ExchangeOrderItem } from "./v2-exchange-order-item.entity";
 export { V2ReverseShipment } from "./v2-reverse-shipment.entity";
 export { V2OrderMedia } from "./v2-order-media.entity";
 export { V2ReturnExchangeMedia } from "./v2-return-exchange-media.entity";
+export { V2AlterationRequest } from "./v2-alteration-request.entity";
 
 import { V2CheckoutSession } from "./v2-checkout-session.entity";
 import { V2Order } from "./v2-order.entity";
@@ -27,6 +28,7 @@ import { V2ExchangeOrderItem } from "./v2-exchange-order-item.entity";
 import { V2ReverseShipment } from "./v2-reverse-shipment.entity";
 import { V2OrderMedia } from "./v2-order-media.entity";
 import { V2ReturnExchangeMedia } from "./v2-return-exchange-media.entity";
+import { V2AlterationRequest } from "./v2-alteration-request.entity";
 
 export const V2_ORDER_ENTITIES = [
   V2CheckoutSession,
@@ -43,4 +45,5 @@ export const V2_ORDER_ENTITIES = [
   V2ReverseShipment,
   V2OrderMedia,
   V2ReturnExchangeMedia,
+  V2AlterationRequest,
 ];

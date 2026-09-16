@@ -20,6 +20,13 @@ export declare enum OrderItemStatusV2 {
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
     DELIVERED = "DELIVERED",
     CANCELLED = "CANCELLED",
+    RTO_INITIATED = "RTO_INITIATED",
+    RTO_IN_TRANSIT = "RTO_IN_TRANSIT",
+    RTO_DELIVERED = "RTO_DELIVERED",
+    RTO_APPROVED_BY_SELLER = "RTO_APPROVED_BY_SELLER",
+    MTM_REFUSED_NON_REFUNDABLE = "MTM_REFUSED_NON_REFUNDABLE",
+    NDR_HELD = "NDR_HELD",
+    NDR_RELEASED = "NDR_RELEASED",
     RETURN_INITIATED = "RETURN_INITIATED",
     RETURN_PICKUP_SCHEDULED = "RETURN_PICKUP_SCHEDULED",
     RETURN_PICKED_UP = "RETURN_PICKED_UP",
@@ -37,6 +44,11 @@ export declare enum OrderItemStatusV2 {
     EXCHANGE_DELIVERED = "EXCHANGE_DELIVERED",
     EXCHANGED = "EXCHANGED",
     EXCHANGE_REJECTED = "EXCHANGE_REJECTED",
+    ALTERATION_REQUESTED = "ALTERATION_REQUESTED",
+    ALTERATION_PICKED_UP = "ALTERATION_PICKED_UP",
+    ALTERATION_AT_SELLER = "ALTERATION_AT_SELLER",
+    ALTERATION_SHIPPED_BACK = "ALTERATION_SHIPPED_BACK",
+    ALTERATION_COMPLETED = "ALTERATION_COMPLETED",
     REFUND_INITIATED = "REFUND_INITIATED",
     REFUND_CREDITED = "REFUND_CREDITED",
     REFUND_FAILED = "REFUND_FAILED"
@@ -120,7 +132,9 @@ export declare enum RefundStatusV2 {
 export declare enum RefundTypeV2 {
     CANCELLATION = "cancellation",
     RETURN = "return",
-    EXCHANGE_DOWNGRADE = "exchange_downgrade"
+    EXCHANGE_DOWNGRADE = "exchange_downgrade",
+    /** Customer refused delivery at the door (RTO) — reported separately from RETURN. */
+    RTS_REFUSED = "rts_refused"
 }
 /** Where the customer wants the refund deposited. */
 export declare enum RefundDestination {
@@ -173,6 +187,17 @@ export declare enum ExchangeOrderItemStatus {
     REJECTED = "REJECTED"
 }
 /**
+ * Request-level status for a V2AlterationRequest — the counterpart to
+ * OrderItemStatusV2's 5 ALTERATION_* item-level statuses (§5.3).
+ */
+export declare enum AlterationRequestStatus {
+    REQUESTED = "REQUESTED",
+    PICKED_UP = "PICKED_UP",
+    AT_SELLER = "AT_SELLER",
+    SHIPPED_BACK = "SHIPPED_BACK",
+    COMPLETED = "COMPLETED"
+}
+/**
  * Who bears the reverse-shipment cost — per Refund & Settlement PRD:
  *   - RETURN           → LABELD absorbs the reverse leg (never charged to customer)
  *   - RTS DELIVERY REFUSED → CUSTOMER pays the reverse leg (deducted from refund)
@@ -220,6 +245,13 @@ export declare enum OrderEventTypeV2 {
     ITEM_OUT_FOR_DELIVERY = "ITEM_OUT_FOR_DELIVERY",
     ITEM_DELIVERED = "ITEM_DELIVERED",
     ITEM_CANCELLED = "ITEM_CANCELLED",
+    RTO_INITIATED = "RTO_INITIATED",
+    RTO_IN_TRANSIT = "RTO_IN_TRANSIT",
+    RTO_DELIVERED = "RTO_DELIVERED",
+    RTO_APPROVED_BY_SELLER = "RTO_APPROVED_BY_SELLER",
+    MTM_REFUSED_NON_REFUNDABLE = "MTM_REFUSED_NON_REFUNDABLE",
+    NDR_HELD = "NDR_HELD",
+    NDR_RELEASED = "NDR_RELEASED",
     RETURN_INITIATED = "RETURN_INITIATED",
     RETURN_PICKED_UP = "RETURN_PICKED_UP",
     RETURN_RECEIVED = "RETURN_RECEIVED",
@@ -228,6 +260,11 @@ export declare enum OrderEventTypeV2 {
     EXCHANGE_PICKED_UP = "EXCHANGE_PICKED_UP",
     EXCHANGE_RECEIVED = "EXCHANGE_RECEIVED",
     EXCHANGED = "EXCHANGED",
+    ALTERATION_REQUESTED = "ALTERATION_REQUESTED",
+    ALTERATION_PICKED_UP = "ALTERATION_PICKED_UP",
+    ALTERATION_AT_SELLER = "ALTERATION_AT_SELLER",
+    ALTERATION_SHIPPED_BACK = "ALTERATION_SHIPPED_BACK",
+    ALTERATION_COMPLETED = "ALTERATION_COMPLETED",
     PAYMENT_CAPTURED = "PAYMENT_CAPTURED",
     REFUND_INITIATED = "REFUND_INITIATED",
     REFUND_CREDITED = "REFUND_CREDITED",

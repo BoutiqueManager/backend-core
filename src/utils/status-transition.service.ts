@@ -23,6 +23,15 @@ export class StatusTransitionService {
         OrderEventTypeV2.ITEM_OUT_FOR_DELIVERY,
       [OrderItemStatusV2.DELIVERED]: OrderEventTypeV2.ITEM_DELIVERED,
       [OrderItemStatusV2.CANCELLED]: OrderEventTypeV2.ITEM_CANCELLED,
+      [OrderItemStatusV2.RTO_INITIATED]: OrderEventTypeV2.RTO_INITIATED,
+      [OrderItemStatusV2.RTO_IN_TRANSIT]: OrderEventTypeV2.RTO_IN_TRANSIT,
+      [OrderItemStatusV2.RTO_DELIVERED]: OrderEventTypeV2.RTO_DELIVERED,
+      [OrderItemStatusV2.RTO_APPROVED_BY_SELLER]:
+        OrderEventTypeV2.RTO_APPROVED_BY_SELLER,
+      [OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE]:
+        OrderEventTypeV2.MTM_REFUSED_NON_REFUNDABLE,
+      [OrderItemStatusV2.NDR_HELD]: OrderEventTypeV2.NDR_HELD,
+      [OrderItemStatusV2.NDR_RELEASED]: OrderEventTypeV2.NDR_RELEASED,
       [OrderItemStatusV2.RETURN_INITIATED]: OrderEventTypeV2.RETURN_INITIATED,
       [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:
         OrderEventTypeV2.RETURN_INITIATED,
@@ -48,6 +57,16 @@ export class StatusTransitionService {
       [OrderItemStatusV2.EXCHANGE_DELIVERED]: OrderEventTypeV2.ITEM_DELIVERED,
       [OrderItemStatusV2.EXCHANGED]: OrderEventTypeV2.EXCHANGED,
       [OrderItemStatusV2.EXCHANGE_REJECTED]: OrderEventTypeV2.STATUS_CHANGED,
+      [OrderItemStatusV2.ALTERATION_REQUESTED]:
+        OrderEventTypeV2.ALTERATION_REQUESTED,
+      [OrderItemStatusV2.ALTERATION_PICKED_UP]:
+        OrderEventTypeV2.ALTERATION_PICKED_UP,
+      [OrderItemStatusV2.ALTERATION_AT_SELLER]:
+        OrderEventTypeV2.ALTERATION_AT_SELLER,
+      [OrderItemStatusV2.ALTERATION_SHIPPED_BACK]:
+        OrderEventTypeV2.ALTERATION_SHIPPED_BACK,
+      [OrderItemStatusV2.ALTERATION_COMPLETED]:
+        OrderEventTypeV2.ALTERATION_COMPLETED,
       [OrderItemStatusV2.REFUND_INITIATED]: OrderEventTypeV2.ORDER_PLACED,
       [OrderItemStatusV2.REFUND_CREDITED]: OrderEventTypeV2.ORDER_PLACED,
       [OrderItemStatusV2.REFUND_FAILED]: OrderEventTypeV2.ORDER_PLACED,
@@ -83,6 +102,20 @@ export class StatusTransitionService {
       [OrderItemStatusV2.CANCELLED]: reason
         ? `Item cancelled by ${actorType}. Reason: ${reason}`
         : `Item cancelled by ${actorType}`,
+      [OrderItemStatusV2.RTO_INITIATED]:
+        "Delivery was refused — item is being returned to seller",
+      [OrderItemStatusV2.RTO_IN_TRANSIT]:
+        "Refused item is in transit back to seller",
+      [OrderItemStatusV2.RTO_DELIVERED]:
+        "Refused item has reached the seller",
+      [OrderItemStatusV2.RTO_APPROVED_BY_SELLER]:
+        "Seller confirmed receipt of the refused item",
+      [OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE]:
+        "Delivery was refused despite multiple attempts — this payment is non-refundable",
+      [OrderItemStatusV2.NDR_HELD]:
+        "Delivery attempt failed — awaiting your remaining balance payment",
+      [OrderItemStatusV2.NDR_RELEASED]:
+        "Balance received — item is being redelivered",
       [OrderItemStatusV2.RETURN_INITIATED]: "Return request has been initiated",
       [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]:
         "Return pickup has been scheduled",
@@ -110,6 +143,16 @@ export class StatusTransitionService {
       [OrderItemStatusV2.EXCHANGED]: "Item has been exchanged successfully",
       [OrderItemStatusV2.EXCHANGE_REJECTED]:
         "Exchange request has been rejected",
+      [OrderItemStatusV2.ALTERATION_REQUESTED]:
+        "Alteration request has been initiated",
+      [OrderItemStatusV2.ALTERATION_PICKED_UP]:
+        "Item has been picked up for alteration",
+      [OrderItemStatusV2.ALTERATION_AT_SELLER]:
+        "Item received by seller — alteration in progress",
+      [OrderItemStatusV2.ALTERATION_SHIPPED_BACK]:
+        "Altered item is on its way back to you",
+      [OrderItemStatusV2.ALTERATION_COMPLETED]:
+        "Alteration completed and item delivered",
       [OrderItemStatusV2.REFUND_INITIATED]: "Refund request has been initiated",
       [OrderItemStatusV2.REFUND_CREDITED]: "Refund has been credited",
       [OrderItemStatusV2.REFUND_FAILED]: "Refund request has failed",

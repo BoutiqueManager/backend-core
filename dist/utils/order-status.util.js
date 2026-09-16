@@ -46,6 +46,21 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
     let outForDeliveryCount = 0;
     let deliveredCount = 0;
     let cancelledCount = 0;
+    // RTO lifecycle (active — not yet terminal)
+    let rtoInitiatedCount = 0;
+    let rtoInTransitCount = 0;
+    let rtoDeliveredCount = 0;
+    // RTO terminal (seller approved — refund guaranteed to fire)
+    let rtoApprovedBySellerCount = 0;
+    // RTO terminal, MTM variant (§5.4) — seller approved, but NO refund fires
+    // (non-refundable). Still folded into terminalReturnCount below, same as
+    // rtoApprovedBySellerCount/returnedCount, since the item is just as
+    // "done" from an order-status-rollup perspective — it just settles with
+    // no money movement instead of a refund.
+    let mtmRefusedNonRefundableCount = 0;
+    // MTM doorstep-gating (active — not yet terminal)
+    let ndrHeldCount = 0;
+    let ndrReleasedCount = 0;
     // Return lifecycle (active — not yet terminal)
     let returnInitiatedCount = 0;
     let returnPickupScheduledCount = 0;
@@ -67,6 +82,15 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
     // Exchange terminal
     let exchangedCount = 0;
     let exchangeRejectedCount = 0;
+    // Alteration lifecycle (§5.3) — counted as "delivered" for order-level
+    // rollup purposes throughout (see effectiveDeliveredCount below), NOT as
+    // an active transition, per the manager's requirement that the ORDER
+    // stays in the Delivered bucket while an item is mid-alteration.
+    let alterationRequestedCount = 0;
+    let alterationPickedUpCount = 0;
+    let alterationAtSellerCount = 0;
+    let alterationShippedBackCount = 0;
+    let alterationCompletedCount = 0;
     // Refund statuses (item-level only; don't affect order-level flow)
     let refundCount = 0;
     for (const s of itemStatuses) {
@@ -94,6 +118,29 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
                 break;
             case order_v2_enum_1.OrderItemStatusV2.CANCELLED:
                 cancelledCount++;
+                break;
+            // ── RTO lifecycle ─────────────────────────────────────────────────────
+            case order_v2_enum_1.OrderItemStatusV2.RTO_INITIATED:
+                rtoInitiatedCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.RTO_IN_TRANSIT:
+                rtoInTransitCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.RTO_DELIVERED:
+                rtoDeliveredCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.RTO_APPROVED_BY_SELLER:
+                rtoApprovedBySellerCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE:
+                mtmRefusedNonRefundableCount++;
+                break;
+            // ── MTM doorstep-gating ──────────────────────────────────────────────
+            case order_v2_enum_1.OrderItemStatusV2.NDR_HELD:
+                ndrHeldCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.NDR_RELEASED:
+                ndrReleasedCount++;
                 break;
             // ── Return lifecycle ──────────────────────────────────────────────────
             case order_v2_enum_1.OrderItemStatusV2.RETURN_INITIATED:
@@ -148,6 +195,22 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
             case order_v2_enum_1.OrderItemStatusV2.EXCHANGE_REJECTED:
                 exchangeRejectedCount++;
                 break;
+            // ── Alteration lifecycle (§5.3) ───────────────────────────────────────
+            case order_v2_enum_1.OrderItemStatusV2.ALTERATION_REQUESTED:
+                alterationRequestedCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.ALTERATION_PICKED_UP:
+                alterationPickedUpCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.ALTERATION_AT_SELLER:
+                alterationAtSellerCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.ALTERATION_SHIPPED_BACK:
+                alterationShippedBackCount++;
+                break;
+            case order_v2_enum_1.OrderItemStatusV2.ALTERATION_COMPLETED:
+                alterationCompletedCount++;
+                break;
             // ── Refund statuses (item-level only) ────────────────────────────────
             case order_v2_enum_1.OrderItemStatusV2.REFUND_INITIATED:
             case order_v2_enum_1.OrderItemStatusV2.REFUND_CREDITED:
@@ -166,8 +229,19 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
     // ── Derive "active" (non-cancelled) items ─────────────────────────────────
     const activeCount = total - cancelledCount;
     // ── Rule 2 & 3: ALL active items DELIVERED (or effectively delivered) ────────
-    // RETURN_REJECTED and EXCHANGE_REJECTED mean the item reverts to delivered
-    const effectiveDeliveredCount = deliveredCount + returnRejectedCount + exchangeRejectedCount;
+    // RETURN_REJECTED and EXCHANGE_REJECTED mean the item reverts to delivered.
+    // Alteration statuses ALSO count here (not in hasActiveTransition below) —
+    // per §5.3's manager requirement, the ORDER stays "Delivered" for the
+    // entire alteration journey even though the ITEM's own status genuinely
+    // progresses through pickup/transit/at-seller.
+    const effectiveDeliveredCount = deliveredCount +
+        returnRejectedCount +
+        exchangeRejectedCount +
+        alterationRequestedCount +
+        alterationPickedUpCount +
+        alterationAtSellerCount +
+        alterationShippedBackCount +
+        alterationCompletedCount;
     if (effectiveDeliveredCount === activeCount) {
         return cancelledCount > 0
             ? order_v2_enum_1.OrderStatusV2.PARTIALLY_CANCELLED
@@ -176,7 +250,11 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
     // ── Rule 4: ALL active items RETURNED or REFUNDED (terminal return) ────────
     // Once item is received by seller, it's in a terminal return state.
     // Refund statuses (REFUND_INITIATED/CREDITED/FAILED) are also terminal return states.
-    const terminalReturnCount = returnedCount + returnReceivedBySellerCount + refundCount;
+    const terminalReturnCount = returnedCount +
+        returnReceivedBySellerCount +
+        refundCount +
+        rtoApprovedBySellerCount +
+        mtmRefusedNonRefundableCount;
     if (terminalReturnCount === activeCount && terminalReturnCount > 0) {
         return order_v2_enum_1.OrderStatusV2.RETURNED;
     }
@@ -221,6 +299,11 @@ function computeOrderStatusFromItemStatuses(itemStatuses) {
         pickupScheduledCount > 0 ||
         shippedCount > 0 ||
         outForDeliveryCount > 0 ||
+        rtoInitiatedCount > 0 ||
+        rtoInTransitCount > 0 ||
+        rtoDeliveredCount > 0 ||
+        ndrHeldCount > 0 ||
+        ndrReleasedCount > 0 ||
         returnInitiatedCount > 0 ||
         returnPickupScheduledCount > 0 ||
         returnPickedUpCount > 0 ||
@@ -256,6 +339,19 @@ function shouldShowEstimatedDelivery(status) {
         order_v2_enum_1.OrderItemStatusV2.EXCHANGED,
         order_v2_enum_1.OrderItemStatusV2.RETURN_REJECTED,
         order_v2_enum_1.OrderItemStatusV2.EXCHANGE_REJECTED,
+        // RTO items are heading back to the seller, not toward delivery.
+        order_v2_enum_1.OrderItemStatusV2.RTO_INITIATED,
+        order_v2_enum_1.OrderItemStatusV2.RTO_IN_TRANSIT,
+        order_v2_enum_1.OrderItemStatusV2.RTO_DELIVERED,
+        order_v2_enum_1.OrderItemStatusV2.RTO_APPROVED_BY_SELLER,
+        order_v2_enum_1.OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE,
+        // Alteration items are mid-alteration-journey, not toward first
+        // delivery — no "estimated delivery" countdown makes sense here.
+        order_v2_enum_1.OrderItemStatusV2.ALTERATION_REQUESTED,
+        order_v2_enum_1.OrderItemStatusV2.ALTERATION_PICKED_UP,
+        order_v2_enum_1.OrderItemStatusV2.ALTERATION_AT_SELLER,
+        order_v2_enum_1.OrderItemStatusV2.ALTERATION_SHIPPED_BACK,
+        order_v2_enum_1.OrderItemStatusV2.ALTERATION_COMPLETED,
     ]);
     return !terminalStatuses.has(status);
 }
@@ -270,6 +366,7 @@ function isRefundFlowStatus(status) {
         order_v2_enum_1.OrderItemStatusV2.REFUND_FAILED,
         order_v2_enum_1.OrderItemStatusV2.RETURN_RECEIVED_BY_SELLER,
         order_v2_enum_1.OrderItemStatusV2.RETURNED,
+        order_v2_enum_1.OrderItemStatusV2.RTO_APPROVED_BY_SELLER,
     ]);
     return refundFlowStatuses.has(status);
 }

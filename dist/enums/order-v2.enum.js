@@ -4,7 +4,7 @@
 // Source of truth for all v2 order-related enumerations.
 // ─────────────────────────────────────────────────────────────────────────────
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = exports.getOrderItemStatusDisplayName = exports.getOrderStatusDisplayName = exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = exports.ORDER_STATUS_DISPLAY_NAMES = exports.isItemStatusFinal = exports.isOrderStatusFinal = exports.getNextPossibleItemStatuses = exports.getNextPossibleOrderStatuses = exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ReverseShipmentCostBearer = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.RazorpayPaymentStatus = exports.RazorpayPaymentMethod = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
+exports.formatOrderItemStatusOptions = exports.formatOrderStatusOptions = exports.getOrderItemStatusDisplayName = exports.getOrderStatusDisplayName = exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = exports.ORDER_STATUS_DISPLAY_NAMES = exports.isItemStatusFinal = exports.isOrderStatusFinal = exports.getNextPossibleItemStatuses = exports.getNextPossibleOrderStatuses = exports.SellerCancellationReason = exports.RefundInitiatedBy = exports.OrderMediaType = exports.MediaSubtypeV2 = exports.ExchangeReasonCategory = exports.ReturnReasonCategory = exports.EventActorTypeV2 = exports.OrderEventTypeV2 = exports.CheckoutSessionStatus = exports.ExchangePricingType = exports.ReverseShipmentStatus = exports.ReverseShipmentCostBearer = exports.AlterationRequestStatus = exports.ExchangeOrderItemStatus = exports.ExchangeOrderStatus = exports.ReturnOrderItemStatus = exports.ReturnOrderStatus = exports.CancelledByV2 = exports.RefundDestination = exports.RefundTypeV2 = exports.RefundStatusV2 = exports.RazorpayPaymentStatus = exports.RazorpayPaymentMethod = exports.PaymentMethodV2 = exports.OrderPaymentStatusV2 = exports.PaymentStatusV2 = exports.PaymentTypeV2 = exports.ProductTypeV2 = exports.OrderItemStatusV2 = exports.OrderStatusV2 = void 0;
 /** Top-level order status, computed from item statuses per PRD global rules. */
 var OrderStatusV2;
 (function (OrderStatusV2) {
@@ -29,6 +29,31 @@ var OrderItemStatusV2;
     OrderItemStatusV2["OUT_FOR_DELIVERY"] = "OUT_FOR_DELIVERY";
     OrderItemStatusV2["DELIVERED"] = "DELIVERED";
     OrderItemStatusV2["CANCELLED"] = "CANCELLED";
+    // ── RTO flow (customer refused delivery at the door) ────────────────────
+    // Courier auto-flips the SAME forward AWB to RTO status — no new
+    // Shiprocket shipment/order is created for this chain.
+    OrderItemStatusV2["RTO_INITIATED"] = "RTO_INITIATED";
+    OrderItemStatusV2["RTO_IN_TRANSIT"] = "RTO_IN_TRANSIT";
+    OrderItemStatusV2["RTO_DELIVERED"] = "RTO_DELIVERED";
+    // Label'D-only state — set when seller taps "Approve — Item Received
+    // Back"; not a Shiprocket-driven status. Only this action unlocks refund.
+    OrderItemStatusV2["RTO_APPROVED_BY_SELLER"] = "RTO_APPROVED_BY_SELLER";
+    // Terminal, permanent — §5.4: a Made-to-Measure item refused/unreachable
+    // at delivery. Set instead of RETURNED so it's distinguishable from a
+    // normal completed RTS return/refund. refund_blocked is set true at the
+    // same step (approveRtoReceived). No refund is ever created for this item.
+    OrderItemStatusV2["MTM_REFUSED_NON_REFUNDABLE"] = "MTM_REFUSED_NON_REFUNDABLE";
+    // ── MTM doorstep-gating flow (balance not cleared at handover) ──────────
+    // Set when a delivery attempt fails while the item's remaining MTM
+    // balance is still unpaid — distinct from a genuine refusal (RTO_INITIATED),
+    // which only fires once the balance is confirmed cleared. See
+    // ShiprocketStatusWriterService's disambiguation logic.
+    OrderItemStatusV2["NDR_HELD"] = "NDR_HELD";
+    // Label'D-only — set once Razorpay confirms balance captured and
+    // POST /ndr/{awb}/reattempt has been called. Not a Shiprocket-driven
+    // status; mirrors RTO_APPROVED_BY_SELLER's role as the unlock gate.
+    // Transitions back into OUT_FOR_DELIVERY, not a new terminal state.
+    OrderItemStatusV2["NDR_RELEASED"] = "NDR_RELEASED";
     // ── Return flow ──────────────────────────────────────────────────────────
     OrderItemStatusV2["RETURN_INITIATED"] = "RETURN_INITIATED";
     OrderItemStatusV2["RETURN_PICKUP_SCHEDULED"] = "RETURN_PICKUP_SCHEDULED";
@@ -48,6 +73,19 @@ var OrderItemStatusV2;
     OrderItemStatusV2["EXCHANGE_DELIVERED"] = "EXCHANGE_DELIVERED";
     OrderItemStatusV2["EXCHANGED"] = "EXCHANGED";
     OrderItemStatusV2["EXCHANGE_REJECTED"] = "EXCHANGE_REJECTED";
+    // ── MTM Alteration flow (§5.3) ───────────────────────────────────────────
+    // Exactly ONE free alteration per item, no questions asked (manager
+    // policy) — enforced via V2OrderItem.alterationCount, not by this status
+    // chain itself. The parent ORDER stays in the "Delivered" bucket for the
+    // entire chain (see order-status.util.ts's effectiveDeliveredCount) even
+    // though the ITEM's own status genuinely progresses through pickup/transit.
+    OrderItemStatusV2["ALTERATION_REQUESTED"] = "ALTERATION_REQUESTED";
+    OrderItemStatusV2["ALTERATION_PICKED_UP"] = "ALTERATION_PICKED_UP";
+    OrderItemStatusV2["ALTERATION_AT_SELLER"] = "ALTERATION_AT_SELLER";
+    OrderItemStatusV2["ALTERATION_SHIPPED_BACK"] = "ALTERATION_SHIPPED_BACK";
+    // Terminal AND permanent — never reverts to plain DELIVERED. The
+    // alterationCount>=1 check (not this status) is what blocks a 2nd request.
+    OrderItemStatusV2["ALTERATION_COMPLETED"] = "ALTERATION_COMPLETED";
     // Refund Process for Each item level status
     OrderItemStatusV2["REFUND_INITIATED"] = "REFUND_INITIATED";
     OrderItemStatusV2["REFUND_CREDITED"] = "REFUND_CREDITED";
@@ -142,6 +180,8 @@ var RefundTypeV2;
     RefundTypeV2["CANCELLATION"] = "cancellation";
     RefundTypeV2["RETURN"] = "return";
     RefundTypeV2["EXCHANGE_DOWNGRADE"] = "exchange_downgrade";
+    /** Customer refused delivery at the door (RTO) — reported separately from RETURN. */
+    RefundTypeV2["RTS_REFUSED"] = "rts_refused";
 })(RefundTypeV2 || (exports.RefundTypeV2 = RefundTypeV2 = {}));
 /** Where the customer wants the refund deposited. */
 var RefundDestination;
@@ -200,6 +240,18 @@ var ExchangeOrderItemStatus;
     ExchangeOrderItemStatus["REJECTED"] = "REJECTED";
 })(ExchangeOrderItemStatus || (exports.ExchangeOrderItemStatus = ExchangeOrderItemStatus = {}));
 /**
+ * Request-level status for a V2AlterationRequest — the counterpart to
+ * OrderItemStatusV2's 5 ALTERATION_* item-level statuses (§5.3).
+ */
+var AlterationRequestStatus;
+(function (AlterationRequestStatus) {
+    AlterationRequestStatus["REQUESTED"] = "REQUESTED";
+    AlterationRequestStatus["PICKED_UP"] = "PICKED_UP";
+    AlterationRequestStatus["AT_SELLER"] = "AT_SELLER";
+    AlterationRequestStatus["SHIPPED_BACK"] = "SHIPPED_BACK";
+    AlterationRequestStatus["COMPLETED"] = "COMPLETED";
+})(AlterationRequestStatus || (exports.AlterationRequestStatus = AlterationRequestStatus = {}));
+/**
  * Who bears the reverse-shipment cost — per Refund & Settlement PRD:
  *   - RETURN           → LABELD absorbs the reverse leg (never charged to customer)
  *   - RTS DELIVERY REFUSED → CUSTOMER pays the reverse leg (deducted from refund)
@@ -254,6 +306,15 @@ var OrderEventTypeV2;
     OrderEventTypeV2["ITEM_OUT_FOR_DELIVERY"] = "ITEM_OUT_FOR_DELIVERY";
     OrderEventTypeV2["ITEM_DELIVERED"] = "ITEM_DELIVERED";
     OrderEventTypeV2["ITEM_CANCELLED"] = "ITEM_CANCELLED";
+    // RTO flow (customer refused delivery at the door)
+    OrderEventTypeV2["RTO_INITIATED"] = "RTO_INITIATED";
+    OrderEventTypeV2["RTO_IN_TRANSIT"] = "RTO_IN_TRANSIT";
+    OrderEventTypeV2["RTO_DELIVERED"] = "RTO_DELIVERED";
+    OrderEventTypeV2["RTO_APPROVED_BY_SELLER"] = "RTO_APPROVED_BY_SELLER";
+    OrderEventTypeV2["MTM_REFUSED_NON_REFUNDABLE"] = "MTM_REFUSED_NON_REFUNDABLE";
+    // MTM doorstep-gating flow
+    OrderEventTypeV2["NDR_HELD"] = "NDR_HELD";
+    OrderEventTypeV2["NDR_RELEASED"] = "NDR_RELEASED";
     // Return/Exchange flow
     OrderEventTypeV2["RETURN_INITIATED"] = "RETURN_INITIATED";
     OrderEventTypeV2["RETURN_PICKED_UP"] = "RETURN_PICKED_UP";
@@ -263,6 +324,12 @@ var OrderEventTypeV2;
     OrderEventTypeV2["EXCHANGE_PICKED_UP"] = "EXCHANGE_PICKED_UP";
     OrderEventTypeV2["EXCHANGE_RECEIVED"] = "EXCHANGE_RECEIVED";
     OrderEventTypeV2["EXCHANGED"] = "EXCHANGED";
+    // MTM Alteration flow
+    OrderEventTypeV2["ALTERATION_REQUESTED"] = "ALTERATION_REQUESTED";
+    OrderEventTypeV2["ALTERATION_PICKED_UP"] = "ALTERATION_PICKED_UP";
+    OrderEventTypeV2["ALTERATION_AT_SELLER"] = "ALTERATION_AT_SELLER";
+    OrderEventTypeV2["ALTERATION_SHIPPED_BACK"] = "ALTERATION_SHIPPED_BACK";
+    OrderEventTypeV2["ALTERATION_COMPLETED"] = "ALTERATION_COMPLETED";
     // Payment/Refund events
     OrderEventTypeV2["PAYMENT_CAPTURED"] = "PAYMENT_CAPTURED";
     OrderEventTypeV2["REFUND_INITIATED"] = "REFUND_INITIATED";
@@ -375,14 +442,37 @@ const getNextPossibleItemStatuses = (currentStatus) => {
         // Scheduled Pickup -
         [OrderItemStatusV2.SCHEDULED_PICKUP]: [OrderItemStatusV2.PICKUP_SCHEDULED],
         [OrderItemStatusV2.PICKUP_SCHEDULED]: [OrderItemStatusV2.SHIPPED],
-        [OrderItemStatusV2.SHIPPED]: [OrderItemStatusV2.OUT_FOR_DELIVERY],
-        [OrderItemStatusV2.OUT_FOR_DELIVERY]: [OrderItemStatusV2.DELIVERED],
-        // Delivered once - can either be returned or marked as completed
+        [OrderItemStatusV2.SHIPPED]: [
+            OrderItemStatusV2.OUT_FOR_DELIVERY,
+            OrderItemStatusV2.RTO_INITIATED, // Customer refused at the door
+            OrderItemStatusV2.NDR_HELD, // MTM: balance not cleared at handover
+        ],
+        [OrderItemStatusV2.OUT_FOR_DELIVERY]: [
+            OrderItemStatusV2.DELIVERED,
+            OrderItemStatusV2.RTO_INITIATED, // Customer refused at the door
+            OrderItemStatusV2.NDR_HELD, // MTM: balance not cleared at handover
+        ],
+        // Delivered once - can either be returned, exchanged, or altered (MTM only)
         [OrderItemStatusV2.DELIVERED]: [
             OrderItemStatusV2.RETURN_INITIATED,
             OrderItemStatusV2.EXCHANGE_INITIATED,
+            OrderItemStatusV2.ALTERATION_REQUESTED,
         ],
         [OrderItemStatusV2.CANCELLED]: [],
+        // ── RTO flow ──────────────────────────────────────────────────────────────
+        [OrderItemStatusV2.RTO_INITIATED]: [OrderItemStatusV2.RTO_IN_TRANSIT],
+        [OrderItemStatusV2.RTO_IN_TRANSIT]: [OrderItemStatusV2.RTO_DELIVERED],
+        [OrderItemStatusV2.RTO_DELIVERED]: [
+            OrderItemStatusV2.RTO_APPROVED_BY_SELLER,
+        ],
+        [OrderItemStatusV2.RTO_APPROVED_BY_SELLER]: [
+            OrderItemStatusV2.RETURNED,
+            OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE,
+        ],
+        [OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE]: [], // terminal, permanent
+        // ── MTM doorstep-gating flow ────────────────────────────────────────────
+        [OrderItemStatusV2.NDR_HELD]: [OrderItemStatusV2.NDR_RELEASED],
+        [OrderItemStatusV2.NDR_RELEASED]: [OrderItemStatusV2.OUT_FOR_DELIVERY],
         // ── Return flow ──────────────────────────────────────────────────────────
         [OrderItemStatusV2.RETURN_INITIATED]: [
             OrderItemStatusV2.RETURN_PICKUP_SCHEDULED,
@@ -434,6 +524,20 @@ const getNextPossibleItemStatuses = (currentStatus) => {
         [OrderItemStatusV2.EXCHANGE_DELIVERED]: [OrderItemStatusV2.EXCHANGED],
         [OrderItemStatusV2.EXCHANGED]: [],
         [OrderItemStatusV2.EXCHANGE_REJECTED]: [],
+        // ── MTM Alteration flow ──────────────────────────────────────────────────
+        [OrderItemStatusV2.ALTERATION_REQUESTED]: [
+            OrderItemStatusV2.ALTERATION_PICKED_UP,
+        ],
+        [OrderItemStatusV2.ALTERATION_PICKED_UP]: [
+            OrderItemStatusV2.ALTERATION_AT_SELLER,
+        ],
+        [OrderItemStatusV2.ALTERATION_AT_SELLER]: [
+            OrderItemStatusV2.ALTERATION_SHIPPED_BACK,
+        ],
+        [OrderItemStatusV2.ALTERATION_SHIPPED_BACK]: [
+            OrderItemStatusV2.ALTERATION_COMPLETED,
+        ],
+        [OrderItemStatusV2.ALTERATION_COMPLETED]: [], // terminal, permanent
         // Refund flow
     };
     return statusFlow[currentStatus] || [];
@@ -459,6 +563,8 @@ const isItemStatusFinal = (status) => {
         OrderItemStatusV2.EXCHANGED,
         OrderItemStatusV2.RETURN_REJECTED,
         OrderItemStatusV2.EXCHANGE_REJECTED,
+        OrderItemStatusV2.ALTERATION_COMPLETED,
+        OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE,
     ];
     return finalStatuses.includes(status);
 };
@@ -490,6 +596,15 @@ exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: "Out for Delivery",
     [OrderItemStatusV2.DELIVERED]: "Delivered",
     [OrderItemStatusV2.CANCELLED]: "Cancelled",
+    // RTO flow
+    [OrderItemStatusV2.RTO_INITIATED]: "RTO Initiated",
+    [OrderItemStatusV2.RTO_IN_TRANSIT]: "RTO In Transit",
+    [OrderItemStatusV2.RTO_DELIVERED]: "RTO Delivered",
+    [OrderItemStatusV2.RTO_APPROVED_BY_SELLER]: "Return Approved by Seller",
+    [OrderItemStatusV2.MTM_REFUSED_NON_REFUNDABLE]: "Non-Refundable — Delivery Refused",
+    // MTM doorstep-gating flow
+    [OrderItemStatusV2.NDR_HELD]: "Awaiting Balance Payment",
+    [OrderItemStatusV2.NDR_RELEASED]: "Balance Received — Redelivering",
     // Return flow
     [OrderItemStatusV2.RETURN_INITIATED]: "Return Initiated",
     [OrderItemStatusV2.RETURN_PICKUP_SCHEDULED]: "Return Pickup Scheduled",
@@ -509,6 +624,12 @@ exports.ORDER_ITEM_STATUS_DISPLAY_NAMES = {
     [OrderItemStatusV2.EXCHANGE_DELIVERED]: "Exchange Delivered",
     [OrderItemStatusV2.EXCHANGED]: "Exchanged",
     [OrderItemStatusV2.EXCHANGE_REJECTED]: "Exchange Rejected",
+    // MTM Alteration flow
+    [OrderItemStatusV2.ALTERATION_REQUESTED]: "Alteration Requested",
+    [OrderItemStatusV2.ALTERATION_PICKED_UP]: "Picked Up for Alteration",
+    [OrderItemStatusV2.ALTERATION_AT_SELLER]: "At Seller — Alteration in Progress",
+    [OrderItemStatusV2.ALTERATION_SHIPPED_BACK]: "On Its Way Back to You",
+    [OrderItemStatusV2.ALTERATION_COMPLETED]: "Alteration Completed",
     [OrderItemStatusV2.SCHEDULED_PICKUP]: "Scheduled Pickup for logistics",
     [OrderItemStatusV2.PICKUP_SCHEDULED]: "Pickup has been Scheduled",
     [OrderItemStatusV2.REFUND_INITIATED]: "Refund Initiated",

@@ -84,6 +84,20 @@ export declare class V2OrderItem {
      * 0 for full-payment and COD items.
      */
     remainingAmount: number;
+    /**
+     * Set true once an item's payment is deemed non-refundable (e.g. an MTM
+     * delivery refusal, §5.4). Persisted, one-way — never reset to false once
+     * set, even if a later re-delivery succeeds. Not yet written by any code
+     * in this round (§5.1/§5.2) — added now so §5.4's later round doesn't
+     * need a second backend-core dependency bump for one boolean.
+     */
+    refundBlocked: boolean;
+    /**
+     * Set once the single one-shot balance-reminder email fires (§5.2) — a
+     * sent/not-sent flag, not a repeating-cadence marker. Null until sent;
+     * once set, the reminder cron never reconsiders this item.
+     */
+    lastBalanceReminderSentAt: Date | null;
     customerNote: string;
     /**
      * Total amount paid on item by customer at checkout (the advance paid now).
@@ -130,6 +144,15 @@ export declare class V2OrderItem {
     /** FK to v2_exchange_order_items — set when exchange request is placed */
     activeExchangeOrderItemId: string;
     /**
+     * Number of alterations performed on this item (§5.3). Manager policy:
+     * exactly one free alteration, no-questions-asked; a second request is
+     * rejected for now (a future paid/policy-gated 2nd+ alteration workflow
+     * is out of scope — this counter is the seam for that later check).
+     */
+    alterationCount: number;
+    /** FK to v2_alteration_requests — set while an alteration is in flight. */
+    activeAlterationRequestId: string;
+    /**
      * PRD: shipping media should be stored only until the return/exchange window closes.
      * Set when item delivered = deliveredAt + max(returnWindowDays, exchangeWindowDays).
      */
@@ -141,6 +164,14 @@ export declare class V2OrderItem {
     trackingNumber: string;
     trackingCarrier: string;
     trackingUrl: string;
+    /** Shiprocket's numeric shipment_id — required for pickup/label/manifest/track calls. */
+    shiprocketShipmentId: number;
+    /** Shiprocket's own order_id (distinct from shipment_id) — required for invoice generation. */
+    shiprocketOrderId: string;
+    pickupToken: string;
+    labelUrl: string;
+    manifestUrl: string;
+    invoiceUrl: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;

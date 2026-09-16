@@ -205,6 +205,24 @@ export class V2OrderItem {
   @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
   remainingAmount: number;
 
+  /**
+   * Set true once an item's payment is deemed non-refundable (e.g. an MTM
+   * delivery refusal, §5.4). Persisted, one-way — never reset to false once
+   * set, even if a later re-delivery succeeds. Not yet written by any code
+   * in this round (§5.1/§5.2) — added now so §5.4's later round doesn't
+   * need a second backend-core dependency bump for one boolean.
+   */
+  @Column({ type: "boolean", default: false })
+  refundBlocked: boolean;
+
+  /**
+   * Set once the single one-shot balance-reminder email fires (§5.2) — a
+   * sent/not-sent flag, not a repeating-cadence marker. Null until sent;
+   * once set, the reminder cron never reconsiders this item.
+   */
+  @Column({ type: "timestamp", nullable: true })
+  lastBalanceReminderSentAt: Date | null;
+
   @Column({ type: "text", nullable: true })
   customerNote: string;
 
@@ -300,6 +318,19 @@ export class V2OrderItem {
   @Column({ type: "uuid", nullable: true })
   activeExchangeOrderItemId: string;
 
+  /**
+   * Number of alterations performed on this item (§5.3). Manager policy:
+   * exactly one free alteration, no-questions-asked; a second request is
+   * rejected for now (a future paid/policy-gated 2nd+ alteration workflow
+   * is out of scope — this counter is the seam for that later check).
+   */
+  @Column({ type: "int", default: 0 })
+  alterationCount: number;
+
+  /** FK to v2_alteration_requests — set while an alteration is in flight. */
+  @Column({ type: "uuid", nullable: true })
+  activeAlterationRequestId: string;
+
   // ─── Seller Shipping Media Expiry ─────────────────────────────────────────
   /**
    * PRD: shipping media should be stored only until the return/exchange window closes.
@@ -328,6 +359,26 @@ export class V2OrderItem {
 
   @Column({ type: "varchar", nullable: true })
   trackingUrl: string;
+
+  /** Shiprocket's numeric shipment_id — required for pickup/label/manifest/track calls. */
+  @Column({ type: "bigint", nullable: true })
+  shiprocketShipmentId: number;
+
+  /** Shiprocket's own order_id (distinct from shipment_id) — required for invoice generation. */
+  @Column({ type: "varchar", nullable: true })
+  shiprocketOrderId: string;
+
+  @Column({ type: "varchar", nullable: true })
+  pickupToken: string;
+
+  @Column({ type: "varchar", nullable: true })
+  labelUrl: string;
+
+  @Column({ type: "varchar", nullable: true })
+  manifestUrl: string;
+
+  @Column({ type: "varchar", nullable: true })
+  invoiceUrl: string;
 
   @Column({ type: "boolean", default: true })
   isActive: boolean;
