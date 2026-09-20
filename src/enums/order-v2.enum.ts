@@ -454,15 +454,22 @@ export const getNextPossibleItemStatuses = (
     // Scheduled Pickup -
     [OrderItemStatusV2.SCHEDULED_PICKUP]: [OrderItemStatusV2.PICKUP_SCHEDULED],
 
-    [OrderItemStatusV2.PICKUP_SCHEDULED]: [OrderItemStatusV2.SHIPPED],
+    // SHIPPED/OUT_FOR_DELIVERY/DELIVERED are deliberately NOT listed as
+    // seller-selectable next statuses from here on down — these are real
+    // courier-scan events Shiprocket already reports automatically via
+    // webhook (ShiprocketStatusWriterService.applyStatusUpdate) + the 5-min
+    // reconciliation cron. Sellers must never be offered these as manual
+    // "Update Status" options. See validateOrderItemStatusTransition
+    // (boutique-server/orders-v2.service.ts) for the corresponding hard
+    // backend block on any direct API attempt to set them, independent of
+    // this list.
+    [OrderItemStatusV2.PICKUP_SCHEDULED]: [],
     [OrderItemStatusV2.SHIPPED]: [
-      OrderItemStatusV2.OUT_FOR_DELIVERY,
       OrderItemStatusV2.RTO_INITIATED, // Customer refused at the door
       OrderItemStatusV2.NDR_HELD, // MTM: balance not cleared at handover
     ],
 
     [OrderItemStatusV2.OUT_FOR_DELIVERY]: [
-      OrderItemStatusV2.DELIVERED,
       OrderItemStatusV2.RTO_INITIATED, // Customer refused at the door
       OrderItemStatusV2.NDR_HELD, // MTM: balance not cleared at handover
     ],
