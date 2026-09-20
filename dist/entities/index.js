@@ -19,4 +19,5 @@ __exportStar(require("./order-v2"), exports);
 __exportStar(require("./boutique-size-guide.entity"), exports);
 __exportStar(require("./product-categories.entity"), exports);
 __exportStar(require("./boutique-settings.entity"), exports);
+__exportStar(require("./packaging-charge.entity"), exports);
 //# sourceMappingURL=index.js.map
