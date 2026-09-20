@@ -6,7 +6,7 @@ import { OrderItemStatusV2 } from "../enums/order-v2.enum";
  *
  * These match @expo/vector-icons MaterialIcons naming.
  */
-export type OrderItemStatusIconName = "pending" | "schedule" | "local-shipping" | "check-circle" | "cancel" | "undo" | "swap-horiz" | "account-balance-wallet" | "info";
+export type OrderItemStatusIconName = "pending" | "schedule" | "local-shipping" | "check-circle" | "cancel" | "undo" | "swap-horiz" | "account-balance-wallet" | "hourglass-empty" | "build" | "block" | "info";
 export interface OrderItemStatusUI {
     color: string;
     icon: OrderItemStatusIconName;
@@ -20,3 +20,11 @@ export declare const ORDER_ITEM_STATUS_ICONS: Record<OrderItemStatusV2, OrderIte
  * Use this in both customer-ui and boutique-native-app.
  */
 export declare function getOrderItemStatusUI(status: string | OrderItemStatusV2 | undefined): OrderItemStatusUI;
+export interface OrderItemStatusUIIonicons {
+    label: string;
+    color: string;
+    icon: string;
+}
+export declare const ORDER_ITEM_STATUS_COLORS_IONICONS: Record<OrderItemStatusV2, string>;
+export declare const ORDER_ITEM_STATUS_ICONS_IONICONS: Record<OrderItemStatusV2, string>;
+export declare function getOrderItemStatusUIIonicons(status: string): OrderItemStatusUIIonicons;

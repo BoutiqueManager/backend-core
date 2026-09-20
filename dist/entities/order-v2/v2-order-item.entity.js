@@ -189,6 +189,14 @@ __decorate([
     __metadata("design:type", Number)
 ], V2OrderItem.prototype, "remainingAmount", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "boolean", default: false }),
+    __metadata("design:type", Boolean)
+], V2OrderItem.prototype, "refundBlocked", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
+    __metadata("design:type", Date)
+], V2OrderItem.prototype, "lastBalanceReminderSentAt", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], V2OrderItem.prototype, "customerNote", void 0);
@@ -273,6 +281,14 @@ __decorate([
     __metadata("design:type", String)
 ], V2OrderItem.prototype, "activeExchangeOrderItemId", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: "int", default: 0 }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "alterationCount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "uuid", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "activeAlterationRequestId", void 0);
+__decorate([
     (0, typeorm_1.Column)({ type: "timestamp", nullable: true }),
     __metadata("design:type", Date)
 ], V2OrderItem.prototype, "shippingMediaExpiresAt", void 0);
@@ -300,6 +316,30 @@ __decorate([
     (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
     __metadata("design:type", String)
 ], V2OrderItem.prototype, "trackingUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "bigint", nullable: true }),
+    __metadata("design:type", Number)
+], V2OrderItem.prototype, "shiprocketShipmentId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "shiprocketOrderId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "pickupToken", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "labelUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "manifestUrl", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "varchar", nullable: true }),
+    __metadata("design:type", String)
+], V2OrderItem.prototype, "invoiceUrl", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "boolean", default: true }),
     __metadata("design:type", Boolean)

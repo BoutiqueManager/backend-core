@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.V2_ORDER_ENTITIES = exports.V2ReturnExchangeMedia = exports.V2OrderMedia = exports.V2ReverseShipment = exports.V2ExchangeOrderItem = exports.V2ExchangeOrder = exports.V2ReturnOrderItem = exports.V2ReturnOrder = exports.V2Refund = exports.V2Payment = exports.V2AppliedCoupon = exports.V2OrderItemEvent = exports.V2OrderItem = exports.V2Order = exports.V2CheckoutSession = void 0;
+exports.V2_ORDER_ENTITIES = exports.V2AlterationRequest = exports.V2ReturnExchangeMedia = exports.V2OrderMedia = exports.V2ReverseShipment = exports.V2ExchangeOrderItem = exports.V2ExchangeOrder = exports.V2ReturnOrderItem = exports.V2ReturnOrder = exports.V2Refund = exports.V2Payment = exports.V2AppliedCoupon = exports.V2OrderItemEvent = exports.V2OrderItem = exports.V2Order = exports.V2CheckoutSession = void 0;
 var v2_checkout_session_entity_1 = require("./v2-checkout-session.entity");
 Object.defineProperty(exports, "V2CheckoutSession", { enumerable: true, get: function () { return v2_checkout_session_entity_1.V2CheckoutSession; } });
 var v2_order_entity_1 = require("./v2-order.entity");
@@ -29,6 +29,8 @@ var v2_order_media_entity_1 = require("./v2-order-media.entity");
 Object.defineProperty(exports, "V2OrderMedia", { enumerable: true, get: function () { return v2_order_media_entity_1.V2OrderMedia; } });
 var v2_return_exchange_media_entity_1 = require("./v2-return-exchange-media.entity");
 Object.defineProperty(exports, "V2ReturnExchangeMedia", { enumerable: true, get: function () { return v2_return_exchange_media_entity_1.V2ReturnExchangeMedia; } });
+var v2_alteration_request_entity_1 = require("./v2-alteration-request.entity");
+Object.defineProperty(exports, "V2AlterationRequest", { enumerable: true, get: function () { return v2_alteration_request_entity_1.V2AlterationRequest; } });
 const v2_checkout_session_entity_2 = require("./v2-checkout-session.entity");
 const v2_order_entity_2 = require("./v2-order.entity");
 const v2_order_item_entity_2 = require("./v2-order-item.entity");
@@ -43,6 +45,7 @@ const v2_exchange_order_item_entity_2 = require("./v2-exchange-order-item.entity
 const v2_reverse_shipment_entity_2 = require("./v2-reverse-shipment.entity");
 const v2_order_media_entity_2 = require("./v2-order-media.entity");
 const v2_return_exchange_media_entity_2 = require("./v2-return-exchange-media.entity");
+const v2_alteration_request_entity_2 = require("./v2-alteration-request.entity");
 exports.V2_ORDER_ENTITIES = [
     v2_checkout_session_entity_2.V2CheckoutSession,
     v2_order_entity_2.V2Order,
@@ -58,5 +61,6 @@ exports.V2_ORDER_ENTITIES = [
     v2_reverse_shipment_entity_2.V2ReverseShipment,
     v2_order_media_entity_2.V2OrderMedia,
     v2_return_exchange_media_entity_2.V2ReturnExchangeMedia,
+    v2_alteration_request_entity_2.V2AlterationRequest,
 ];
 //# sourceMappingURL=index.js.map

@@ -98,6 +98,50 @@ export const getEventDisplayInfo = (
       icon: "❌",
       color: "#F44336",
     },
+    [OrderEventTypeV2.RTO_INITIATED]: {
+      title: "RTO Initiated",
+      description: "Delivery was refused — item is being returned to seller",
+      icon: "↩️",
+      color: "#FF5722",
+    },
+    [OrderEventTypeV2.RTO_IN_TRANSIT]: {
+      title: "RTO In Transit",
+      description: "Refused item is in transit back to seller",
+      icon: "🚚",
+      color: "#FF5722",
+    },
+    [OrderEventTypeV2.RTO_DELIVERED]: {
+      title: "RTO Delivered",
+      description: "Refused item has reached the seller",
+      icon: "📦",
+      color: "#FF5722",
+    },
+    [OrderEventTypeV2.RTO_APPROVED_BY_SELLER]: {
+      title: "Return Approved by Seller",
+      description: "Seller confirmed receipt of the refused item",
+      icon: "✅",
+      color: "#FF5722",
+    },
+    [OrderEventTypeV2.MTM_REFUSED_NON_REFUNDABLE]: {
+      title: "Non-Refundable — Delivery Refused",
+      description:
+        "Delivery was refused despite multiple attempts — this payment is non-refundable",
+      icon: "🚫",
+      color: "#B91C1C",
+    },
+    [OrderEventTypeV2.NDR_HELD]: {
+      title: "Awaiting Balance Payment",
+      description:
+        "Delivery attempt failed — awaiting your remaining balance payment",
+      icon: "⏳",
+      color: "#0284C7",
+    },
+    [OrderEventTypeV2.NDR_RELEASED]: {
+      title: "Balance Received",
+      description: "Balance received — item is being redelivered",
+      icon: "🚴",
+      color: "#0284C7",
+    },
     [OrderEventTypeV2.RETURN_INITIATED]: {
       title: "Return Initiated",
       description: "Return request has been initiated",
@@ -145,6 +189,36 @@ export const getEventDisplayInfo = (
       description: "Item has been exchanged",
       icon: "🔄",
       color: "#607D8B",
+    },
+    [OrderEventTypeV2.ALTERATION_REQUESTED]: {
+      title: "Alteration Requested",
+      description: "Alteration request has been initiated",
+      icon: "✂️",
+      color: "#8B5CF6",
+    },
+    [OrderEventTypeV2.ALTERATION_PICKED_UP]: {
+      title: "Picked Up for Alteration",
+      description: "Item has been picked up for alteration",
+      icon: "📦",
+      color: "#8B5CF6",
+    },
+    [OrderEventTypeV2.ALTERATION_AT_SELLER]: {
+      title: "At Seller",
+      description: "Item received by seller — alteration in progress",
+      icon: "🧵",
+      color: "#8B5CF6",
+    },
+    [OrderEventTypeV2.ALTERATION_SHIPPED_BACK]: {
+      title: "Shipped Back",
+      description: "Altered item is on its way back to you",
+      icon: "🚚",
+      color: "#8B5CF6",
+    },
+    [OrderEventTypeV2.ALTERATION_COMPLETED]: {
+      title: "Alteration Completed",
+      description: "Alteration completed and item delivered",
+      icon: "✅",
+      color: "#8B5CF6",
     },
     [OrderEventTypeV2.PAYMENT_CAPTURED]: {
       title: "Payment Captured",
